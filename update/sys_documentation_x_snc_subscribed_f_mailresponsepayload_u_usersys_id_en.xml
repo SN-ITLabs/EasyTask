@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update>
+    <sys_documentation element="u_usersys_id" label="UserSys_id" language="en" table="x_snc_subscribed_f_mailresponsepayload">
+        <sys_documentation action="INSERT_OR_UPDATE">
+            <element>u_usersys_id</element>
+            <help/>
+            <hint/>
+            <label>UserSys_id</label>
+            <language>en</language>
+            <name>x_snc_subscribed_f_mailresponsepayload</name>
+            <plural>UserSys_ids</plural>
+            <sys_class_name>sys_documentation</sys_class_name>
+            <sys_created_by>souvik</sys_created_by>
+            <sys_created_on>2017-09-04 09:45:17</sys_created_on>
+            <sys_customer_update>false</sys_customer_update>
+            <sys_id>000a9d786fc98700f928c8c17c3ee459</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>UserSys_id</sys_name>
+            <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+            <sys_policy/>
+            <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+            <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+            <sys_update_name>sys_documentation_x_snc_subscribed_f_mailresponsepayload_u_usersys_id_en</sys_update_name>
+            <sys_updated_by>souvik</sys_updated_by>
+            <sys_updated_on>2017-09-04 09:45:17</sys_updated_on>
+            <url/>
+            <url_target/>
+        </sys_documentation>
+    </sys_documentation>
+</record_update>

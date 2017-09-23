@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sysauto_script">
+    <sysauto_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <condition/>
+        <conditional>false</conditional>
+        <name>Update Tasks Reminder</name>
+        <run_as display_value="">ca6be16e4f340700afef74828110c702</run_as>
+        <run_as_tz/>
+        <run_dayofmonth>1</run_dayofmonth>
+        <run_dayofweek>1</run_dayofweek>
+        <run_period/>
+        <run_start>2017-08-28 12:20:59</run_start>
+        <run_time>1970-01-01 14:30:00</run_time>
+        <run_type>daily</run_type>
+        <script><![CDATA[var scheduler = {};
+scheduler.getTasksByAssignedTo = function(){
+	var restMessage = new sn_ws.RESTMessageV2();
+	restMessage.setBasicAuth("souvik.ghosh","iWcMyPwde4d!");
+	restMessage.setHttpMethod('get');
+	restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/x_snc_tasklogfrome_subscribedformail');
+	restMessage.setQueryParameter('sysparm_query','u_email_tasks=1');
+	var response = restMessage.execute();
+	var parser = JSON.parse(response.getBody());
+	var _task,_defect,_incident;
+	for (var i =0; i<parser.result.length; i++){
+		restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/rm_scrum_task');
+		restMessage.setQueryParameter('sysparm_query','active=true^assigned_to='+parser.result[i].u_user_subscribed.value);
+		var _userTasks = JSON.parse(restMessage.execute().getBody());
+		restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/rm_defect');
+		restMessage.setQueryParameter('sysparm_query','active=true^assigned_to='+parser.result[i].u_user_subscribed.value);
+		var _userDefects = JSON.parse(restMessage.execute().getBody());
+		restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/incident');
+		restMessage.setQueryParameter('sysparm_query','active=true^assigned_to='+parser.result[i].u_user_subscribed.value);
+		var _userIncidents = JSON.parse(restMessage.execute().getBody());
+		restMessage.setEndpoint(parser.result[i].u_user_subscribed.link);
+		var _userDetails = JSON.parse(restMessage.execute().getBody());
+		var user = _userDetails.result.email.toString();
+		try{
+			_task = getScrumTasks(_userTasks,restMessage);
+		}
+		catch(err){
+			_task = {};
+		}
+		try{
+			_defect = getDefects(_userDefects,restMessage);
+		}
+		catch(err){
+			_defect = {};
+		}
+		try{
+			_incident = getIncidents(_userIncidents,restMessage);
+		}
+		catch(err){
+			_incident = {};
+		}
+		var tasks = {
+			first_name: _userDetails.result.first_name.toString(),
+			scrumTasks: _task,
+			defects: _defect,
+			incidents: _incident
+		};
+		//Event is firing
+		gs.eventQueue('x_snc_subscribed_f.logWorkHours', current, JSON.stringify(user), JSON.stringify(tasks));
+		
+	}
+};
+
+scheduler.getTasksByAssignedTo();]]></script>
+        <sys_class_name>sysauto_script</sys_class_name>
+        <sys_created_by>souvik</sys_created_by>
+        <sys_created_on>2017-08-28 12:21:42</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>ac8a75666f30c300f928c8c17c3ee4d9</sys_id>
+        <sys_mod_count>111</sys_mod_count>
+        <sys_name>Update Tasks Reminder</sys_name>
+        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sysauto_script_ac8a75666f30c300f928c8c17c3ee4d9</sys_update_name>
+        <sys_updated_by>souvik</sys_updated_by>
+        <sys_updated_on>2017-09-18 08:18:25</sys_updated_on>
+        <upgrade_safe>false</upgrade_safe>
+    </sysauto_script>
+</record_update>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_snc_subscribed_f.getDefects</api_name>
+        <client_callable>false</client_callable>
+        <description>Gets all Defects for a particular user!</description>
+        <name>getDefects</name>
+        <script><![CDATA[function getDefects(_userTasks,restMessage){
+	var gr;
+	var _task = {taskDetails: []};
+	for(var j = 0;j<_userTasks.result.length;j++){
+		restMessage.setEndpoint(_userTasks.result[j].parent.link);
+		var story_details = JSON.parse(restMessage.execute().getBody());
+		var regexResult = (/^((?:\S+\s+){2}\S+)/g).exec(story_details.result.short_description.toString());
+		var regexRes = (/^((?:\S+\s+){2}\S+)/g).exec(_userTasks.result[j].short_description.toString());
+		var story_desc, task_dec;
+		if(regexResult != null && story_details.result.short_description.toString().substring(0,24).length < regexResult.length)
+			story_desc = regexResult[0] + '...';
+		else
+			story_desc = story_details.result.short_description.toString().length <= story_details.result.short_description.toString().substring(0,24) ? story_details.result.short_description.toString() + '.' : story_details.result.short_description.toString().substring(0,24) + '...';
+		if(regexRes != null && _userTasks.result[j].short_description.toString().substring(0,24).length < regexRes.length)
+			task_dec = regexRes[0] + '...';
+		else
+			task_dec = _userTasks.result[j].short_description.toString().length <= _userTasks.result[j].short_description.toString().substring(0,24) ? _userTasks.result[j].short_description.toString() + '.' : _userTasks.result[j].short_description.toString().substring(0,24) + '...';
+		var _today_logged_hours = 0;
+		var _logged_hours_till_today = 0;
+		var time_worked = 0;
+		if(_userTasks.result[j].time_worked !== '')
+			time_worked = Number(_userTasks.result[j].time_worked.split(' ')[1].split(':')[0]);
+		gr = new GlideRecord('x_snc_subscribed_f_mailresponsepayload');
+		gr.addQuery('u_task_id','=',_userTasks.result[j].number.toString());
+		gr.query();
+		if(gr.hasNext()){
+			while(gr.next()){
+				_today_logged_hours = time_worked - Number(gr.u_hours);
+				_logged_hours_till_today = Number(time_worked) - _today_logged_hours;
+				gr.u_previous_hours = gr.u_hours;
+				gr.u_previous_state = gr.u_state;
+				gr.u_state = Number(_userTasks.result[j].state);
+				gr.u_hours = Number(_userTasks.result[j].time_worked.split(' ')[1].split(':')[0]);
+				gr.update();
+			}
+		}
+		else{
+			gr.u_hours = time_worked;
+			gs.info('I am here!!');
+			gr.u_state = Number(_userTasks.result[j].state);
+			gr.u_previous_hours = gr.u_hours;
+			gr.u_previous_state = gr.u_state;
+			gr.u_task_id = _userTasks.result[j].number.toString();
+			_today_logged_hours = gr.u_hours;
+			gr.insert();
+		}
+		var _taskDetails = {
+			number: _userTasks.result[j].number.toString(),
+			story: story_details.result.number.toString(),
+			task_type : 'Defect',
+			short_desc_ : story_desc,
+			short_description: task_dec,
+			state: _userTasks.result[j].state.toString(),
+			logged: _logged_hours_till_today.toString(),
+			today_hours: _today_logged_hours.toString()
+		};
+		_task.taskDetails.push(_taskDetails);
+	}
+	return _task === undefined ? '':_task;
+}]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>souvik</sys_created_by>
+        <sys_created_on>2017-09-08 08:47:38</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>fb0335c66f8d0b00f928c8c17c3ee4d2</sys_id>
+        <sys_mod_count>24</sys_mod_count>
+        <sys_name>getDefects</sys_name>
+        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_script_include_fb0335c66f8d0b00f928c8c17c3ee4d2</sys_update_name>
+        <sys_updated_by>souvik</sys_updated_by>
+        <sys_updated_on>2017-09-12 12:10:54</sys_updated_on>
+    </sys_script_include>
+</record_update>

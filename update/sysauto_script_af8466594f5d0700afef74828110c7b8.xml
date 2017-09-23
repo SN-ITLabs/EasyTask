@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sysauto_script">
+    <sysauto_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <condition/>
+        <conditional>false</conditional>
+        <name>SyncTasksForManagersSubscribedToDigest</name>
+        <run_as display_value="">ca6be16e4f340700afef74828110c702</run_as>
+        <run_as_tz/>
+        <run_dayofmonth>1</run_dayofmonth>
+        <run_dayofweek>1</run_dayofweek>
+        <run_period/>
+        <run_start>2017-09-18 14:43:41</run_start>
+        <run_time>1970-01-01 19:30:00</run_time>
+        <run_type>daily</run_type>
+        <script><![CDATA[function syncTasks(){
+	var restMessage = new sn_ws.RESTMessageV2();
+	restMessage.setBasicAuth('souvik.ghosh','iWcMyPwde4d!');
+	restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/core_company');
+	restMessage.setQueryParameter('sysparm_query','name\=Service\-now.com');
+	restMessage.setHttpMethod('get');
+	var company = JSON.parse(restMessage.execute().getBody());
+	restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/u_employee');
+	restMessage.setQueryParameter('sysparm_query','active=true^u_manager_role=true^comapny='+company.result[0].sys_id+'^country=IN^emailLIKEChaitanya.Saragadam');
+	restMessage.setQueryParameter('sysparm_fields','email,first_name,sys_id');
+	var allManagersOfServiceNowIndia = JSON.parse(restMessage.execute().getBody());
+	for(var i =0; i<allManagersOfServiceNowIndia.result.length;i++){
+		var tasks = getManagerDelegatesTasks(restMessage,allManagersOfServiceNowIndia.result[i].sys_id);
+		for(var _taskOwner in tasks){
+			var _task = tasks[_taskOwner];
+			for (var _i = 0; _i < _task.length; _i++){
+				var gr = new GlideRecord('x_snc_subscribed_f_mailresponsepayload');
+				gr.addQuery('u_task_id','=',_task[_i].number);
+				gr.query();
+				if(gr.hasNext()){
+					while(gr.next()){
+						gr.u_previous_hours = gr.u_hours;
+						gr.u_previous_state = gr.u_state;
+						gr.u_state = Number(_task[_i].state);
+						gr.u_hours = Number(_task[_i].hours);
+						gr.update();
+					}
+				}
+				else{
+					gr.initialize();
+					gr.u_task_id = _task[_i].number;
+					gr.u_previous_hours = 0;
+					gr.u_previous_state = -6;
+					gr.u_state = Number(_task[_i].state);
+					gr.u_hours = Number(_task[_i].hours);
+					gr.insert();
+				}
+			}
+		}
+	}		
+}
+syncTasks();]]></script>
+        <sys_class_name>sysauto_script</sys_class_name>
+        <sys_created_by>souvik</sys_created_by>
+        <sys_created_on>2017-09-18 14:56:16</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>af8466594f5d0700afef74828110c7b8</sys_id>
+        <sys_mod_count>9</sys_mod_count>
+        <sys_name>SyncTasksForManagersSubscribedToDigest</sys_name>
+        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sysauto_script_af8466594f5d0700afef74828110c7b8</sys_update_name>
+        <sys_updated_by>souvik</sys_updated_by>
+        <sys_updated_on>2017-09-18 15:54:55</sys_updated_on>
+        <upgrade_safe>false</upgrade_safe>
+    </sysauto_script>
+</record_update>

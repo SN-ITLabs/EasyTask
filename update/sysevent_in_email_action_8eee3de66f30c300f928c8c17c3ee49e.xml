@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update sys_domain="global" table="sysevent_in_email_action">
+    <sysevent_in_email_action action="INSERT_OR_UPDATE">
+        <action>record_action</action>
+        <active>true</active>
+        <assignment_operator/>
+        <condition_script/>
+        <description/>
+        <event_name>email.read</event_name>
+        <filter_condition/>
+        <from/>
+        <name>UpdateOrCreateTasks</name>
+        <order>100</order>
+        <reply_email/>
+        <required_roles/>
+        <script><![CDATA[(function runAction(/*GlideRecord*/ current, /*GlideRecord*/ event, /*EmailWrapper*/ email, /*ScopedEmailLogger*/ logger, /*EmailClassifier*/ classifier) {
+	// Implement email action here
+	
+	var regexFromMobile= new RegExp(/STSK\d{7};[\w+]*;[\w\s]+(\.{3})*;[\w\s]+(\.{3})*;(\d|-\d);\d+;\d+;/gm);
+	var newTaskFromMobile = new RegExp(/new_task\d;[\w+]*;STRY\d{7};[\w\s]+;(\d|-\d);\d+;\d+;/gm);
+	var regexForDefect = new RegExp(/(id\=\"DFCT\d{7}\")[><\w\s=\"\-:\/,;]*<\/td>/gm);
+	var regexForDefectMobile = new RegExp(/DFCT\d{7};[\w+]*;[\w\s]+(\.{3})*;[\w\s]+(\.{3})*;(\d|-\d);\d+;\d+;/gm);
+	var regexForIncident = new RegExp(/(id\=\"INC\d{7}\")[><\w\s=\"\-:\/,;]*<\/td>/gm);
+	var regexForIncidentMobile = new RegExp(/INC\d{7};[\w+]*;[\w\s]+(\.{3})*;[\w\s]+(\.{3})*;(\d|-\d);\d+;\d+;/gm);
+	var regexfromEmail = new RegExp(/(id\=\"STSK\d{7}\")[><\w\s=\"\-:\/,;]*<\/td>/gm);
+	var regexToParseNewTask = new RegExp(/(id\=\"new_task\d\")[><\w\s=\"\-:\/,;]*<\/td>/gm);
+	var formEmailResponseJSON = extractJSONFromEmailResponse(email.body_html,regexFromMobile,regexfromEmail);
+	var createTasksJSON = extractJSONFromEmailResponse(email.body_html,newTaskFromMobile,regexToParseNewTask);
+	var formDefectResponse = extractJSONFromEmailResponse(email.body_html,regexForDefectMobile,regexForDefect);
+	var incidentResponseJSON = extractJSONFromEmailResponse(email.body_html,regexForIncidentMobile,regexForIncident);
+	var _response_incident = updateIncidentsViaRest(incidentResponseJSON);
+	updatePayloadTable(_response_incident);
+	var _response_defect = updatesDefectsViaRest(formDefectResponse);
+	updatePayloadTable(_response_defect);
+	var _response_task = updateTasksViaRest(formEmailResponseJSON);
+	updatePayloadTable(_response_task);
+	var _response_new_task = createTasksViaRest(createTasksJSON, email.from);
+	updatePayloadTable(_response_new_task);
+	var response = {
+		ScrumTasks: {
+			response_task: _response_task,
+			response_new_task: _response_new_task
+		},
+		Defects: {
+			response_defect : _response_defect
+		},
+		Incidents: {
+			response_incident : _response_incident
+		}
+	};
+	gs.eventQueue('x_snc_subscribed_f.acknowledgeTaskRespon', current, email.from, JSON.stringify(response));
+})(current, event, email, logger, classifier);]]></script>
+        <stop_processing>false</stop_processing>
+        <sys_class_name>sysevent_in_email_action</sys_class_name>
+        <sys_created_by>souvik</sys_created_by>
+        <sys_created_on>2017-08-28 12:42:21</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>8eee3de66f30c300f928c8c17c3ee49e</sys_id>
+        <sys_mod_count>136</sys_mod_count>
+        <sys_name>UpdateOrCreateTasks</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sysevent_in_email_action_8eee3de66f30c300f928c8c17c3ee49e</sys_update_name>
+        <sys_updated_by>souvik</sys_updated_by>
+        <sys_updated_on>2017-09-11 11:25:54</sys_updated_on>
+        <table>sysauto_script</table>
+        <template/>
+        <type>reply</type>
+    </sysevent_in_email_action>
+</record_update>

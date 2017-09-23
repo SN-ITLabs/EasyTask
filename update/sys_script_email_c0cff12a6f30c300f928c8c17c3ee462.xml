@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_email">
+    <sys_script_email action="INSERT_OR_UPDATE">
+        <name>coarrangeAllTasks</name>
+        <new_lines_to_html>true</new_lines_to_html>
+        <script><![CDATA[(function runMailScript(/* GlideRecord */ current, /* TemplatePrinter */ template,
+/* Optional EmailOutbound */ email, /* Optional GlideRecord */ email_action,
+/* Optional GlideRecord */ event) {
+	
+	// Add your code here
+	
+	email.setSubject('Please Update your Tasks for today');
+	var userTasks = JSON.parse(event.parm2);
+	var keysOfJSON = ['task_type','short_description','short_desc_','state','logged','today_hours'];
+	template.print('<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable"><tr>                <td align="left" valign="top"><table border="0" cellpadding="0" cellspacing="0" width="600" id="emailContainer">');
+	template.print('<tr align="left" border = "0"><td><strong>Hey, ' + userTasks.first_name + '</strong></td></tr></table><br><br><table border="1" cellpadding="20" cellspacing="0" width="600" id="emailContainer">');
+	var checkTasks = 0;
+	for (var eachTask in userTasks.scrumTasks.taskDetails){
+		if(checkTasks == 0)
+			template.print("<tr><th align='center' valign='top'>Type of Task</th><th align='center' valign='top'>Story Description</th><th align='center' valign='top'>Task Short Description</th><th align='center' valign='top'>State</th><th align='center' valign='top'>Logged Hours Before Today</th><th align='center' valign='top'>Today's Efforts</th></tr>");
+		checkTasks++;
+		var obj = userTasks.scrumTasks.taskDetails[eachTask];
+		template.print("<tr>");
+		for(var key in obj){
+			if (keysOfJSON.indexOf(key) > -1)
+				template.print("<td align='center' valign='top' id='"+obj['number']+"'>"+obj[key].toString()+"</td>");
+		}
+	}
+	
+	for (var _eachTask in userTasks.defects.taskDetails){
+		if(checkTasks == 0)
+			template.print("<tr><th align='center' valign='top'>Type of Task</th><th align='center' valign='top'>Story Description</th><th align='center' valign='top'>Task Short Description</th><th align='center' valign='top'>State</th><th align='center' valign='top'>Logged Hours Before Today</th><th align='center' valign='top'>Today's Efforts</th></tr>");
+		var _obj = userTasks.defects.taskDetails[_eachTask];
+		template.print("<tr>");
+		for(var _key in _obj){
+			if (keysOfJSON.indexOf(_key) > -1)
+				template.print("<td align='center' valign='top' id='"+_obj['number']+"'>"+_obj[_key].toString()+"</td>");
+		}
+	}
+	
+	for (var _task in userTasks.incidents.taskDetails){
+		if(checkTasks == 0)
+			template.print("<tr><th align='center' valign='top'>Type of Task</th><th align='center' valign='top'>Story Description</th><th align='center' valign='top'>Task Short Description</th><th align='center' valign='top'>State</th><th align='center' valign='top'>Logged Hours Before Today</th><th align='center' valign='top'>Today's Efforts</th></tr>");
+		var _objtask = userTasks.incidents.taskDetails[_task];
+		template.print("<tr>");
+		for(var _keytask in _objtask){
+			if (keysOfJSON.indexOf(_keytask) > -1 && _keytask !== 'short_desc_')
+				template.print("<td align='center' valign='top' id='"+_objtask['number']+"'>"+_objtask[_keytask].toString()+"</td>");
+			else if (_keytask === 'short_desc_')
+				template.print("<td align='center' valign='top' id='"+_objtask['number']+"'>...</td>");
+		}
+	}
+	
+	template.print('</tr></table><table border="1" cellpadding="20" cellspacing="0" width="600" id="emailNewTaskContainer"><p><strong>For New Tasks, Enter Below</strong></p><br/>');
+	for(var j=0;j<3;j++){
+		template.print("<tr><td align='center' valign='top' id='new_task"+j+"'>Type of Task</td><td align='center' valign='top' id='new_task"+j+"'>Enter Story Number</td><td align='center' valign='top' id='new_task"+j+"'>Enter Short Description</td><td align='center' valign='top' id='new_task"+j+"'>Enter Task State</td><td align='center' valign='top' id='new_task"+j+"'>Enter Planned Hours</td><td align='center' valign='top' id='new_task"+j+"'>Hours to log</td></tr>");
+	}
+	template.print('</table><table cellpadding="20" cellspacing="0" width="600" id="emailNewTaskContainer">');
+	template.print("<p hidden><strong>When using mobile clients please copy & paste the pre-created \';\' delimetered format for each task in reply mail</strong></p><br\><p hidden><strong>TaskNumber;Task_type;Story Description;Short Description;State;LoggedHours;Today\'sEfforts;</strong></p>");
+	for(var eachTaskNext in userTasks.scrumTasks.taskDetails){
+		var objNext = userTasks.scrumTasks.taskDetails[eachTaskNext];
+		template.print("<p hidden>");
+		for(var keyNext in objNext){
+			if(keyNext.indexOf('story') == -1 && keyNext.indexOf('today_hours') == -1)
+				template.print(objNext[keyNext].toString()+"\;");
+			else if(keyNext.indexOf('today_hours') > -1)
+				template.print(objNext[keyNext].toString());
+		}
+		template.print("</p>");
+	}
+	
+	for(var _eachTaskNext in userTasks.defects.taskDetails){
+		var _objNext = userTasks.defects.taskDetails[_eachTaskNext];
+		template.print("<p hidden>");
+		for(var _keyNext in _objNext){
+			if(_keyNext.indexOf('story') == -1 && _keyNext.indexOf('today_hours') == -1)
+				template.print(_objNext[_keyNext].toString()+"\;");
+			else if(_keyNext.indexOf('today_hours') > -1)
+				template.print(_objNext[_keyNext].toString());
+		}
+		template.print("</p>");
+	}
+	
+	for (var _inc in userTasks.incidents.taskDetails){
+		var _incobj = userTasks.incidents.taskDetails[_inc];
+		template.print("<p hidden>");
+		for(var _incNext in _incobj){
+			if(_incNext.indexOf('story') == -1 && _incNext.indexOf('today_hours') == -1)
+				template.print(_incobj[_incNext].toString()+"\;");
+			else if(_incNext.indexOf('today_hours') > -1)
+				template.print(_incobj[_incNext].toString());
+		}
+		template.print("</p>");
+	}
+	template.print('<br\><p hidden><strong>For New Task, just reply as\:<br\>new_task(seq_number[0-9]);Task_type;StoryNumber;ShortDescription;State;PlannedHours;HoursToLog;</strong></p></table></td></tr></table>');
+})(current, template, email, email_action, event);]]></script>
+        <sys_class_name>sys_script_email</sys_class_name>
+        <sys_created_by>souvik</sys_created_by>
+        <sys_created_on>2017-08-28 12:44:53</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>c0cff12a6f30c300f928c8c17c3ee462</sys_id>
+        <sys_mod_count>68</sys_mod_count>
+        <sys_name>coarrangeAllTasks</sys_name>
+        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_script_email_c0cff12a6f30c300f928c8c17c3ee462</sys_update_name>
+        <sys_updated_by>souvik</sys_updated_by>
+        <sys_updated_on>2017-09-12 09:26:24</sys_updated_on>
+    </sys_script_email>
+</record_update>

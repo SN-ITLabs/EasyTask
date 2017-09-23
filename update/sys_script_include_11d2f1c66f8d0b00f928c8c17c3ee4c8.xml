@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_snc_subscribed_f.getScrumTasks</api_name>
+        <client_callable>false</client_callable>
+        <description>Gets all Scrum Tasks for a user!</description>
+        <name>getScrumTasks</name>
+        <script><![CDATA[function getScrumTasks(_userTasks,restMessage){
+	var gr;
+	var _task = {taskDetails: []};
+	for(var j = 0;j<_userTasks.result.length;j++){
+		restMessage.setEndpoint(_userTasks.result[j].parent.link);
+		var story_details = JSON.parse(restMessage.execute().getBody());
+		var regexResult = (/^((?:\S+\s+){2}\S+)/g).exec(story_details.result.short_description.toString());
+		var regexRes = (/^((?:\S+\s+){2}\S+)/g).exec(_userTasks.result[j].short_description.toString());
+		var story_desc, task_dec;
+		if(regexResult != null && story_details.result.short_description.toString().substring(0,24).length < regexResult.length)
+			story_desc = regexResult[0] + '...';
+		else
+			story_desc = story_details.result.short_description.toString().length < story_details.result.short_description.toString().substring(0,24) ? story_details.result.short_description.toString() + '.' : story_details.result.short_description.toString().substring(0,24) + '...';
+		if(regexRes != null && _userTasks.result[j].short_description.toString().substring(0,24).length < regexRes.length)
+			task_dec = regexRes[0] + '...';
+		else
+			task_dec = _userTasks.result[j].short_description.toString().length < _userTasks.result[j].short_description.toString().substring(0,24) ? _userTasks.result[j].short_description.toString() + '.' : _userTasks.result[j].short_description.toString().substring(0,24) + '...';
+		var _today_logged_hours = 0;
+		var _logged_hours_till_today = 0;
+		gr = new GlideRecord('x_snc_subscribed_f_mailresponsepayload');
+		gr.addQuery('u_task_id','=',_userTasks.result[j].number.toString());
+		gr.query();
+		if(gr.hasNext()){
+			while(gr.next()){
+				_today_logged_hours = Number(_userTasks.result[j].hours) - Number(gr.u_hours);
+				_logged_hours_till_today = Number(_userTasks.result[j].hours) - _today_logged_hours;
+				gr.u_previous_hours = gr.u_hours;
+				gr.u_previous_state = gr.u_state;
+				gr.u_state = Number(_userTasks.result[j].state);
+				gr.u_hours = Number(_userTasks.result[j].hours);
+				gr.update();
+			}
+		}
+		else{
+			gr.u_hours = Number(_userTasks.result[j].hours);
+			gr.u_state = Number(_userTasks.result[j].state);
+			gr.u_previous_hours = gr.u_hours;
+			gr.u_previous_state = gr.u_state;
+			gr.u_task_id = _userTasks.result[j].number.toString();
+			_today_logged_hours = gr.u_hours;
+			gr.insert();
+		}
+		var _taskDetails = {
+			number: _userTasks.result[j].number.toString(),
+			story: story_details.result.number.toString(),
+			task_type : _userTasks.result[j].type.toString(),
+			short_desc_ : story_desc,
+			short_description: task_dec,
+			state: _userTasks.result[j].state.toString(),
+			logged: _logged_hours_till_today.toString(),
+			today_hours: _today_logged_hours.toString()
+		};
+		_task.taskDetails.push(_taskDetails);
+	}
+	return _task === undefined ? '':_task;
+}]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>souvik</sys_created_by>
+        <sys_created_on>2017-09-08 08:46:56</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>11d2f1c66f8d0b00f928c8c17c3ee4c8</sys_id>
+        <sys_mod_count>7</sys_mod_count>
+        <sys_name>getScrumTasks</sys_name>
+        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_script_include_11d2f1c66f8d0b00f928c8c17c3ee4c8</sys_update_name>
+        <sys_updated_by>souvik</sys_updated_by>
+        <sys_updated_on>2017-09-12 09:14:46</sys_updated_on>
+    </sys_script_include>
+</record_update>

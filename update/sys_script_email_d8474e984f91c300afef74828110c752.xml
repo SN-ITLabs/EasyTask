@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_email">
+    <sys_script_email action="INSERT_OR_UPDATE">
+        <name>tasksReport</name>
+        <new_lines_to_html>false</new_lines_to_html>
+        <script><![CDATA[(function runMailScript(/* GlideRecord */ current, /* TemplatePrinter */ template,
+          /* Optional EmailOutbound */ email, /* Optional GlideRecord */ email_action,
+          /* Optional GlideRecord */ event) {
+
+          // Add your code here
+	var tasks = JSON.parse(event.parm2);
+	email.setSubject('Details of Task Updates');
+	template.print('<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable"><tr><td align="left" valign="top"><table cellpadding="0" cellspacing="0" width="700px"><p><strong>Progress report of tasks:</strong></p><br/>');
+	var border = 'border: 1px solid #0368d4;';
+	var webKitBorder = '-webkit-border-radius: 3px;';
+	var mozBorder = '-moz-border-radius: 3px;';
+	var width = 'width: 200px;';
+	var padding = 'padding: 5px;';
+	var count = 0;
+	for(var _taskOwner in tasks){
+		var resultTasks = tasks[_taskOwner];
+		var _firstName = _taskOwner.toString().split('.')[0];
+		_firstName = _firstName.replace(_firstName.charAt(0),_firstName.charAt(0).toUpperCase());
+		template.print('<table><p><strong>'+_firstName+'\'s tasks</strong></p>');
+		template.print('<tr>');
+		for(var i = 0; i < resultTasks.scrum_tasks.length; i++){
+			if(count > 2){
+				template.print('</tr><tr>');
+				count = 0;
+			}
+			template.print('<td style="'+width+border+webKitBorder+padding+mozBorder+'"><p> '+resultTasks[i].short_description+'<\p>');
+			template.print('<p> '+resultTasks[i].story+'</p>');
+			template.print('<p> State: '+resultTasks[i].oldState+' \-\> '+resultTasks[i].state+'</p>');
+			template.print('<p> Hours: '+resultTasks[i].oldHours+' \-\> '+resultTasks[i].hours+'</p></td>');
+			count++;
+		}
+		for(var j = 0; j < resultTasks.defects.length; i++){
+			if(count > 2){
+				template.print('</tr><tr>');
+				count = 0;
+			}
+			template.print('<td style="'+width+border+webKitBorder+padding+mozBorder+'"><p> '+resultTasks[i].short_description+'<\p>');
+			template.print('<p> '+resultTasks[i].story+'</p>');
+			template.print('<p> State: '+resultTasks[j].oldState+' \-\> '+resultTasks[j].state+'</p>');
+			template.print('<p> Hours: '+resultTasks[j].oldHours+' \-\> '+resultTasks[j].hours+'</p></td>');
+			count++;
+		}
+		template.print('</tr></table>');
+		count = 0;
+	}
+	template.print('</table></td></tr></table>');
+})(current, template, email, email_action, event);]]></script>
+        <sys_class_name>sys_script_email</sys_class_name>
+        <sys_created_by>souvik</sys_created_by>
+        <sys_created_on>2017-09-15 10:22:54</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>d8474e984f91c300afef74828110c752</sys_id>
+        <sys_mod_count>21</sys_mod_count>
+        <sys_name>tasksReport</sys_name>
+        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_script_email_d8474e984f91c300afef74828110c752</sys_update_name>
+        <sys_updated_by>souvik</sys_updated_by>
+        <sys_updated_on>2017-09-20 08:55:07</sys_updated_on>
+    </sys_script_email>
+</record_update>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_snc_subscribed_f.extractJSONFromEmailResponse</api_name>
+        <client_callable>false</client_callable>
+        <description>On Demand Script to parse Email Response Text</description>
+        <name>extractJSONFromEmailResponse</name>
+        <script><![CDATA[function extractJSONFromEmailResponse(emailString,regex, regex2){
+	var tasks = {};
+	var j = 0;
+	while((regexResults = regex.exec(emailString)) != null){
+		var _taskid = regexResults[0].split(';')[0].toString();
+		if(!tasks.hasOwnProperty(_taskid)){
+			tasks[_taskid] = {
+				taskAttributes : {}
+			};
+			j = 0;
+		}
+		var taskDetails = regexResults[0].split(';');
+		for(var i=0; i<taskDetails.length;i++){
+			if(taskDetails[i] == ' ' || taskDetails[i] == null){
+				taskDetails[i] = '';
+			}
+			if(regex.toString() == newTaskFromMobile.toString())
+				tasks[_taskid].taskAttributes[arr_new_Mobile[j]] = taskDetails[i];
+			else
+				tasks[_taskid].taskAttributes[arrMobile[j]] = taskDetails[i];
+			j++;
+		}
+	}
+	if(regex.exec(emailString) == null)
+		tasks = _formEmailResponseJSON(emailString.replace(/\r?\n|\r/gm,""),regex2);
+	return tasks;
+}
+var _formEmailResponseJSON = function(emailString,regex){
+	var tasks = {};
+	var i = 0;
+	while((regexResults = regex.exec(emailString)) != null){
+		var _taskid = replaceAll((regexResults[1].split('='))[1].toString(),'\"','');
+		if(!tasks.hasOwnProperty(_taskid)){
+			tasks[_taskid] = {
+				taskAttributes : {}
+			};
+			i = 0;
+		}
+		var _taskAttribute = _extractAttributesFromHtmlTags(regexResults["0"]);
+		if(regex + "" == regexToParseNewTask + ""){
+			if(checkDemoString.indexOf(_taskAttribute) > -1 && regex.toString() == regexToParseNewTask.toString())
+				_taskAttribute = '';
+			tasks[_taskid].taskAttributes[arr_new_task[i]] = _taskAttribute;
+		}
+		else
+			tasks[_taskid].taskAttributes[arr[i]] = _taskAttribute;
+		i++;
+	}
+	return tasks;
+};
+var newTaskFromMobile = new RegExp(/new_task\d;[\w+]*;STRY\d{7};[\w\s]+;(\d|-\d);\d+;\d+/gm);
+var regexToParseNewTask = new RegExp(/(id\=\"new_task\d\")[><\w\s=\"\-:\/,;]*<\/td>/gm);
+var checkDemoString = ['Enter Planned Hours','Type of Task','Enter Short Description','Enter Task State','Hours to log','Enter Story Details'];
+var arr = ['task_type','state','logged_hours','hours'];
+var arr_new_task = ['task_type','story','short_description','state','planned_hours','hours'];
+var arrMobile = ['number','task_type','story_details','short_description','state','logged_hours','hours'];
+var arr_new_Mobile = ['new_task_id','task_type','story','short_description','state','planned_hours','hours'];
+var _extractAttributesFromHtmlTags = function(_taskAttr){
+	if(new RegExp(/<p.*>/gm).exec(_taskAttr) == null){
+		return '';
+	}
+	return _taskAttr.substring(_taskAttr.indexOf('>',_taskAttr.indexOf('<'))+1,_taskAttr.indexOf('<',_taskAttr.indexOf('>',_taskAttr.indexOf('<'))));
+};
+var replaceAll = function(str,search,replacement){
+	return str.split(search).join(replacement);
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>souvik</sys_created_by>
+        <sys_created_on>2017-08-31 17:43:50</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>398f1a2b6f3c0700f928c8c17c3ee43e</sys_id>
+        <sys_mod_count>33</sys_mod_count>
+        <sys_name>extractJSONFromEmailResponse</sys_name>
+        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_script_include_398f1a2b6f3c0700f928c8c17c3ee43e</sys_update_name>
+        <sys_updated_by>souvik</sys_updated_by>
+        <sys_updated_on>2017-09-05 08:43:07</sys_updated_on>
+    </sys_script_include>
+</record_update>

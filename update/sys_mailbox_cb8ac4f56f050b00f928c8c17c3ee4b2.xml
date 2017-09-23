@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_mailbox">
+    <sys_mailbox action="INSERT_OR_UPDATE">
+        <name>Requests</name>
+        <sys_class_name>sys_mailbox</sys_class_name>
+        <sys_created_by>souvik</sys_created_by>
+        <sys_created_on>2017-09-07 06:32:19</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>cb8ac4f56f050b00f928c8c17c3ee4b2</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Requests</sys_name>
+        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_mailbox_cb8ac4f56f050b00f928c8c17c3ee4b2</sys_update_name>
+        <sys_updated_by>souvik</sys_updated_by>
+        <sys_updated_on>2017-09-07 06:32:19</sys_updated_on>
+        <system_mailbox>true</system_mailbox>
+    </sys_mailbox>
+</record_update>

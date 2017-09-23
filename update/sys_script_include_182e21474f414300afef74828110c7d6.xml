@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_snc_subscribed_f.updateIncidentsViaRest</api_name>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>updateIncidentsViaRest</name>
+        <script><![CDATA[function updateIncidentsViaRest(incidentResponseJSON){
+	gs.info(JSON.stringify(incidentResponseJSON));
+	var queryParamString = 'number\=';
+	var queryKeys = 'state,short_description,actual_time_worked,sys_id,assigned_to';
+	var objKeys = Object.keys(incidentResponseJSON);
+	for(var i=0; i<objKeys.length-1; i++){
+		queryParamString += objKeys[i] + '\^ORnumber\='; 
+	}
+	queryParamString += objKeys[objKeys.length-1];
+	gs.info("Param: "+queryParamString);
+	var restMessage = new sn_ws.RESTMessageV2();
+	restMessage.setBasicAuth("souvik.ghosh","iWcMyPwde4d!");
+	restMessage.setHttpMethod('GET');
+	restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/incident');
+	restMessage.setQueryParameter('sysparm_query',queryParamString);
+	restMessage.setQueryParameter('sysparm_fields',queryKeys);
+	var responseScrumTasks = JSON.parse(restMessage.execute().getBody());
+	var result_counter = 0;
+	var task = {};
+	var response = {};
+	for (var eachTask in incidentResponseJSON){
+		var _hours = Number(incidentResponseJSON[eachTask].taskAttributes.hours) + Number(incidentResponseJSON[eachTask].taskAttributes.logged_hours);
+		var _state = incidentResponseJSON[eachTask].taskAttributes.state;
+		restMessage = new sn_ws.RESTMessageV2();
+		restMessage.setBasicAuth("souvik.ghosh","iWcMyPwde4d!");
+		restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/incident/'+responseScrumTasks.result[result_counter].sys_id);
+		restMessage.setRequestHeader('Content-Type','application/json');
+		restMessage.setRequestHeader('Accept','application/json');
+		restMessage.setHttpMethod('PUT');
+		task = {
+			"actual_time_worked":_hours,
+			"state":_state 
+		};
+		restMessage.setRequestBody(JSON.stringify(task));
+		var _responseCode = restMessage.execute();
+		var _response = JSON.parse(_responseCode.getBody());
+		response[eachTask] = {
+			status: _responseCode.getStatusCode(),
+			payload: {
+				number: _response.result.number,
+				short_description: _response.result.short_description,
+				state: _response.result.state,
+				hours: _response.result.actual_time_worked,
+				sys_id: _response.result.sys_id
+			},
+			sys_id: responseScrumTasks.result[result_counter].assigned_to.value
+		};
+		result_counter++;
+	}
+	return response;
+}]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>souvik</sys_created_by>
+        <sys_created_on>2017-09-11 11:07:32</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>182e21474f414300afef74828110c7d6</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>updateIncidentsViaRest</sys_name>
+        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_script_include_182e21474f414300afef74828110c7d6</sys_update_name>
+        <sys_updated_by>souvik</sys_updated_by>
+        <sys_updated_on>2017-09-11 11:16:12</sys_updated_on>
+    </sys_script_include>
+</record_update>
