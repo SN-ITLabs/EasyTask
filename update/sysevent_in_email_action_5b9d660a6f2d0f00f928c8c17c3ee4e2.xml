@@ -23,11 +23,11 @@
 	if(email.to.indexOf('+subscribe') == -1)
 		active = false;
 	var restMessage = new sn_ws.RESTMessageV2();
-	restMessage.setBasicAuth('souvik.ghosh','iWcMyPwde4d!');
-	restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/sys_user');
+	var endpointBase = 'https://' + gs.getProperty('x_snc_easytask.surf_instance_name') + '.service-now.com/api/now/table/';
+	restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
+	restMessage.setHttpMethod('get');
 	restMessage.setQueryParameter('sysparm_query','active=true^email='+email.from);
 	restMessage.setQueryParameter('sysparm_fields','first_name,sys_id');
-	restMessage.setHttpMethod('get');
 	var _user = JSON.parse(restMessage.execute().getBody());
 	var gr = new GlideRecord('x_snc_easytask_subscribedforemailnotifications');
 	gr.addQuery('u_devsysid',_user.result[0].sys_id);
@@ -56,7 +56,7 @@
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>5b9d660a6f2d0f00f928c8c17c3ee4e2</sys_id>
-        <sys_mod_count>17</sys_mod_count>
+        <sys_mod_count>19</sys_mod_count>
         <sys_name>DigestForEmail</sys_name>
         <sys_overrides/>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
@@ -65,7 +65,7 @@
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sysevent_in_email_action_5b9d660a6f2d0f00f928c8c17c3ee4e2</sys_update_name>
         <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-10-11 12:54:39</sys_updated_on>
+        <sys_updated_on>2017-10-25 11:12:16</sys_updated_on>
         <table>x_snc_easytask_subscribedforemailnotifications</table>
         <template/>
         <type>new</type>
