@@ -3,7 +3,7 @@
     <sys_script_include action="INSERT_OR_UPDATE">
         <access>package_private</access>
         <active>true</active>
-        <api_name>x_snc_subscribed_f.updatesDefectsViaRest</api_name>
+        <api_name>x_snc_easytask.updatesDefectsViaRest</api_name>
         <client_callable>false</client_callable>
         <description/>
         <name>updatesDefectsViaRest</name>
@@ -18,9 +18,10 @@
 	queryParamString += objKeys[objKeys.length-1];
 	gs.info("Param: "+queryParamString);
 	var restMessage = new sn_ws.RESTMessageV2();
-	restMessage.setBasicAuth("souvik.ghosh","iWcMyPwde4d!");
+	var restMessageDetails = new RESTMessageSetup();
+	restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
 	restMessage.setHttpMethod('GET');
-	restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/rm_defect');
+	restMessage.setEndpoint(restMessageDetails.getInstance() + 'rm_defect');
 	restMessage.setQueryParameter('sysparm_query',queryParamString);
 	restMessage.setQueryParameter('sysparm_fields',queryKeys);
 	var responseScrumTasks = JSON.parse(restMessage.execute().getBody());
@@ -31,8 +32,8 @@
 		var _hours = Number(formDefectResponse[eachTask].taskAttributes.hours) + Number(formDefectResponse[eachTask].taskAttributes.logged_hours);
 		var _state = formDefectResponse[eachTask].taskAttributes.state;
 		restMessage = new sn_ws.RESTMessageV2();
-		restMessage.setBasicAuth("souvik.ghosh","iWcMyPwde4d!");
-		restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/rm_defect/'+responseScrumTasks.result[result_counter].sys_id);
+		restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
+		restMessage.setEndpoint(restMessageDetails.getInstance() + 'rm_defect/'+responseScrumTasks.result[result_counter].sys_id);
 		restMessage.setRequestHeader('Content-Type','application/json');
 		restMessage.setRequestHeader('Accept','application/json');
 		restMessage.setHttpMethod('PUT');
@@ -65,14 +66,14 @@
         <sys_created_on>2017-09-11 09:25:29</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>dca711cb4f014300afef74828110c73b</sys_id>
-        <sys_mod_count>3</sys_mod_count>
+        <sys_mod_count>4</sys_mod_count>
         <sys_name>updatesDefectsViaRest</sys_name>
-        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy>read</sys_policy>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
-        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_include_dca711cb4f014300afef74828110c73b</sys_update_name>
         <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-09-11 10:41:36</sys_updated_on>
+        <sys_updated_on>2017-10-04 12:28:01</sys_updated_on>
     </sys_script_include>
 </record_update>

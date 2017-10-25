@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_snc_easytask.syncAllTaskStates</api_name>
+        <client_callable>false</client_callable>
+        <description>Syncs all Tasks with the Production Environment</description>
+        <name>syncAllTaskStates</name>
+        <script><![CDATA[var syncAllTaskStates = function(restMessageDetails,managerDetails){
+	var tasks = {_task: []};
+	var employeeList, result;	
+	var endpointBase = 'https://' + gs.getProperty('x_snc_easytask.surf_instance_name') + '.service-now.com/api/now/table/';
+	var restMessage = new sn_ws.RESTMessageV2();
+	restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
+	restMessage.setHttpMethod('get');
+	restMessage.setEndpoint(endpointBase + 'u_employee');
+	restMessage.setQueryParameter('sysparm_query','active=true^manager='+managerDetails);
+	restMessage.setQueryParameter('sysparm_fields','first_name,sys_id');
+	result = restMessage.execute();
+	
+	employeeList = JSON.parse(result.getBody());
+	
+	restMessage = new sn_ws.RESTMessageV2();
+	restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
+	restMessage.setHttpMethod('get');
+	restMessage.setEndpoint(endpointBase + 'rm_scrum_task');
+	
+	var _userTasks = {},_userDefects = {};
+	
+	if(employeeList){
+		for(var emp =0;emp<employeeList.result.length;emp++) {		
+			restMessage.setQueryParameter('sysparm_query','active=true^assigned_to='+employeeList.result[emp].sys_id);			
+			restMessage.setQueryParameter('sysparm_fields','number,state,hours');
+			result = restMessage.execute();
+			if(result && result.getBody()){
+				_userTasks = JSON.parse(result.getBody());
+
+				if(_userTasks){
+					for(var i = 0; i<_userTasks.result.length;i++){
+						tasks._task.push(_userTasks.result[i]);
+					}						
+				}
+				
+				restMessage = new sn_ws.RESTMessageV2();
+				restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
+				restMessage.setHttpMethod('get');
+				restMessage.setEndpoint(endpointBase + 'rm_defect');
+				restMessage.setQueryParameter('sysparm_query','active=true^assigned_to='+employeeList.result[emp].sys_id);
+				restMessage.setQueryParameter('sysparm_fields','number,state,time_worked');
+				restMessage.setHttpMethod('get');
+				result = restMessage.execute();
+				if(result && result.getBody()) {
+					_userDefects = JSON.parse(result.getBody());
+					if(_userDefects){
+						for(var j = 0; j<_userDefects.result.length;j++){
+							tasks._task.push(_userDefects.result[j]);
+						}												
+					}
+				}
+			}				
+		}
+	}
+	
+	return tasks;
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>souvik</sys_created_by>
+        <sys_created_on>2017-10-04 10:20:34</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>b70e7f526fa54f00f928c8c17c3ee4ef</sys_id>
+        <sys_mod_count>14</sys_mod_count>
+        <sys_name>syncAllTaskStates</sys_name>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_script_include_b70e7f526fa54f00f928c8c17c3ee4ef</sys_update_name>
+        <sys_updated_by>souvik</sys_updated_by>
+        <sys_updated_on>2017-10-25 08:21:25</sys_updated_on>
+    </sys_script_include>
+</record_update>

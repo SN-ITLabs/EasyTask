@@ -3,29 +3,25 @@
     <sys_script_include action="INSERT_OR_UPDATE">
         <access>package_private</access>
         <active>true</active>
-        <api_name>x_snc_subscribed_f.updatePayloadTable</api_name>
+        <api_name>x_snc_easytask.updatePayloadTable</api_name>
         <client_callable>false</client_callable>
         <description>Updates the payload table with the Email Body Response</description>
         <name>updatePayloadTable</name>
         <script><![CDATA[function updatePayloadTable(response){
 	for (var _response in response){
-		var gr = new GlideRecord('x_snc_subscribed_f_mailresponsepayload');
+		var gr = new GlideRecord('x_snc_easytask_mailresponsepayload');
 		gr.addQuery('u_task_id','=',response[_response].payload.number.toString());
 		gr.query();
-		if(gr.hasNext()){
-			while(gr.next()){
-				gr.u_response = response[_response].status;
-				gr.u_payload = JSON.stringify(response[_response].payload);
-				gr.u_usersys_id = response[_response].sys_id;
-				gr.u_hours = response[_response].payload.hours;
-				gr.update();
-			}
-		}
-		else{
-			gr.u_response = response[_response].status;
-			gr.u_payload = JSON.stringify(response[_response].payload);
+		if(gr.next()){
 			gr.u_usersys_id = response[_response].sys_id;
 			gr.u_hours = response[_response].payload.hours;
+			gr.update();
+		}
+		else{
+			gr.initialize();
+			gr.u_usersys_id = response[_response].sys_id;
+			gr.u_hours = response[_response].payload.hours;
+			gr.u_task_id = response[_response].payload.number.toString();
 			gr.insert();
 		}
 	}	
@@ -35,14 +31,14 @@
         <sys_created_on>2017-09-04 14:15:05</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>61671eb46f4d8700f928c8c17c3ee438</sys_id>
-        <sys_mod_count>9</sys_mod_count>
+        <sys_mod_count>13</sys_mod_count>
         <sys_name>updatePayloadTable</sys_name>
-        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy>read</sys_policy>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
-        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_include_61671eb46f4d8700f928c8c17c3ee438</sys_update_name>
         <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-09-07 16:36:20</sys_updated_on>
+        <sys_updated_on>2017-10-23 16:57:16</sys_updated_on>
     </sys_script_include>
 </record_update>

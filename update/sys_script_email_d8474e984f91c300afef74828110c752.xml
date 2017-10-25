@@ -19,19 +19,20 @@
 	var count = 0;
 	for(var _taskOwner in tasks){
 		var resultTasks = tasks[_taskOwner];
+		if(resultTasks.hours != 0) {
 		var _firstName = _taskOwner.toString().split('.')[0];
 		_firstName = _firstName.replace(_firstName.charAt(0),_firstName.charAt(0).toUpperCase());
-		template.print('<table><p><strong>'+_firstName+'\'s tasks</strong></p>');
+		template.print('<table><p><strong>Hours logged by '+_firstName+' yesterday: </strong>'+resultTasks.hours+'</p>');
 		template.print('<tr>');
 		for(var i = 0; i < resultTasks.scrum_tasks.length; i++){
 			if(count > 2){
 				template.print('</tr><tr>');
 				count = 0;
 			}
-			template.print('<td style="'+width+border+webKitBorder+padding+mozBorder+'"><p> '+resultTasks[i].short_description+'<\p>');
-			template.print('<p> '+resultTasks[i].story+'</p>');
-			template.print('<p> State: '+resultTasks[i].oldState+' \-\> '+resultTasks[i].state+'</p>');
-			template.print('<p> Hours: '+resultTasks[i].oldHours+' \-\> '+resultTasks[i].hours+'</p></td>');
+			template.print('<td style="'+width+border+webKitBorder+padding+mozBorder+'"><p> '+resultTasks.scrum_tasks[i].short_description+'<\p>');
+			template.print('<p> '+resultTasks.scrum_tasks[i].story+'</p>');
+			template.print('<p> State: '+resultTasks.scrum_tasks[i].oldState+' \-\> '+resultTasks.scrum_tasks[i].state+'</p>');
+			template.print('<p> Hours: '+resultTasks.scrum_tasks[i].oldHours+' \-\> '+resultTasks.scrum_tasks[i].hours+'</p></td>');
 			count++;
 		}
 		for(var j = 0; j < resultTasks.defects.length; i++){
@@ -39,14 +40,15 @@
 				template.print('</tr><tr>');
 				count = 0;
 			}
-			template.print('<td style="'+width+border+webKitBorder+padding+mozBorder+'"><p> '+resultTasks[i].short_description+'<\p>');
-			template.print('<p> '+resultTasks[i].story+'</p>');
-			template.print('<p> State: '+resultTasks[j].oldState+' \-\> '+resultTasks[j].state+'</p>');
-			template.print('<p> Hours: '+resultTasks[j].oldHours+' \-\> '+resultTasks[j].hours+'</p></td>');
+			template.print('<td style="'+width+border+webKitBorder+padding+mozBorder+'"><p> '+resultTasks.defects[j].short_description+'<\p>');
+			//template.print('<p> '+resultTasks[i].story+'</p>');
+			template.print('<p> State: '+resultTasks.defects[j].oldState+' \-\> '+resultTasks.defects[j].state+'</p>');
+			template.print('<p> Hours: '+resultTasks.defects[j].oldHours+' \-\> '+resultTasks.defects[j].hours+'</p></td>');
 			count++;
 		}
-		template.print('</tr></table>');
 		count = 0;
+		}
+		template.print('</tr></table>');
 	}
 	template.print('</table></td></tr></table>');
 })(current, template, email, email_action, event);]]></script>
@@ -55,14 +57,14 @@
         <sys_created_on>2017-09-15 10:22:54</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>d8474e984f91c300afef74828110c752</sys_id>
-        <sys_mod_count>21</sys_mod_count>
+        <sys_mod_count>31</sys_mod_count>
         <sys_name>tasksReport</sys_name>
-        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
-        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_email_d8474e984f91c300afef74828110c752</sys_update_name>
         <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-09-20 08:55:07</sys_updated_on>
+        <sys_updated_on>2017-10-11 17:42:13</sys_updated_on>
     </sys_script_email>
 </record_update>

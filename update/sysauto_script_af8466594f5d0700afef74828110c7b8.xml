@@ -14,42 +14,39 @@
         <run_time>1970-01-01 19:30:00</run_time>
         <run_type>daily</run_type>
         <script><![CDATA[function syncTasks(){
+	var restMessageDetails = new RESTMessageSetup();
 	var restMessage = new sn_ws.RESTMessageV2();
-	restMessage.setBasicAuth('souvik.ghosh','iWcMyPwde4d!');
-	restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/core_company');
+	restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
+	restMessage.setEndpoint(restMessageDetails.getInstance() + 'core_company');
 	restMessage.setQueryParameter('sysparm_query','name\=Service\-now.com');
 	restMessage.setHttpMethod('get');
 	var company = JSON.parse(restMessage.execute().getBody());
-	restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/u_employee');
+	restMessage.setEndpoint(restMessageDetails.getInstance() + 'u_employee');
 	restMessage.setQueryParameter('sysparm_query','active=true^u_manager_role=true^comapny='+company.result[0].sys_id+'^country=IN^emailLIKEChaitanya.Saragadam');
-	restMessage.setQueryParameter('sysparm_fields','email,first_name,sys_id');
+	restMessage.setQueryParameter('sysparm_fields','sys_id');
 	var allManagersOfServiceNowIndia = JSON.parse(restMessage.execute().getBody());
 	for(var i =0; i<allManagersOfServiceNowIndia.result.length;i++){
-		var tasks = getManagerDelegatesTasks(restMessage,allManagersOfServiceNowIndia.result[i].sys_id);
-		for(var _taskOwner in tasks){
-			var _task = tasks[_taskOwner];
-			for (var _i = 0; _i < _task.length; _i++){
-				var gr = new GlideRecord('x_snc_subscribed_f_mailresponsepayload');
-				gr.addQuery('u_task_id','=',_task[_i].number);
-				gr.query();
-				if(gr.hasNext()){
-					while(gr.next()){
-						gr.u_previous_hours = gr.u_hours;
-						gr.u_previous_state = gr.u_state;
-						gr.u_state = Number(_task[_i].state);
-						gr.u_hours = Number(_task[_i].hours);
-						gr.update();
-					}
-				}
-				else{
-					gr.initialize();
-					gr.u_task_id = _task[_i].number;
-					gr.u_previous_hours = 0;
-					gr.u_previous_state = -6;
-					gr.u_state = Number(_task[_i].state);
-					gr.u_hours = Number(_task[_i].hours);
-					gr.insert();
-				}
+		var tasks = syncAllTaskStates(restMessageDetails,allManagersOfServiceNowIndia.result[i].sys_id);
+		gs.info('Tasks Returned: '+JSON.stringify(tasks));
+		for (var _i = 0; _i < tasks._task.length; _i++){
+			var gr = new GlideRecord('x_snc_easytask_mailresponsepayload');
+			gr.addQuery('u_task_id','=',tasks._task[_i].number);
+			gr.query();
+			if(gr.next()){
+				gr.u_previous_hours = gr.u_hours;
+				gr.u_previous_state = gr.u_state;
+				gr.u_state = Number(tasks._task[_i].state);
+				gr.u_hours = Number(tasks._task[_i].hours);
+				gr.update();
+			}
+			else{
+				gr.initialize();
+				gr.u_task_id = tasks._task[_i].number;
+				gr.u_previous_hours = 0;
+				gr.u_previous_state = -6;
+				gr.u_state = Number(tasks._task[_i].state);
+				gr.u_hours = Number(tasks._task[_i].hours);
+				gr.insert();
 			}
 		}
 	}		
@@ -60,15 +57,15 @@ syncTasks();]]></script>
         <sys_created_on>2017-09-18 14:56:16</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>af8466594f5d0700afef74828110c7b8</sys_id>
-        <sys_mod_count>9</sys_mod_count>
+        <sys_mod_count>23</sys_mod_count>
         <sys_name>SyncTasksForManagersSubscribedToDigest</sys_name>
-        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
-        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sysauto_script_af8466594f5d0700afef74828110c7b8</sys_update_name>
         <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-09-18 15:54:55</sys_updated_on>
+        <sys_updated_on>2017-10-24 05:52:50</sys_updated_on>
         <upgrade_safe>false</upgrade_safe>
     </sysauto_script>
 </record_update>

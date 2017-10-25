@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <element label="Mail Response Payload" max_length="40" name="x_snc_easytask_mailresponsepayload" type="collection">
+        <element label="Date created" max_length="40" name="date" text_index="true" type="glide_date_time"/>
+        <element label="Hours" max_length="40" name="u_hours" type="integer"/>
+        <element label="Previous hours" max_length="40" name="u_previous_hours" type="integer"/>
+        <element choice="3" default="-6" label="Previous state" max_length="40" name="u_previous_state" type="integer">
+            <choice>
+                <element label="Draft" sequence="0" value="-6"/>
+                <element label="Ready" sequence="1" value="1"/>
+                <element label="Work in progress" sequence="2" value="2"/>
+                <element label="Complete" sequence="3" value="3"/>
+                <element label="Cancelled" sequence="4" value="4"/>
+            </choice>
+        </element>
+        <element choice="3" default="-6" label="State" max_length="40" name="u_state" type="integer">
+            <choice>
+                <element label="Draft" sequence="0" value="-6"/>
+                <element label="Ready" sequence="1" value="1"/>
+                <element label="Work in progress" sequence="2" value="2"/>
+                <element label="Complete" sequence="3" value="3"/>
+                <element label="Cancelled" sequence="4" value="4"/>
+            </choice>
+        </element>
+        <element attributes="edge_encryption_enabled=true" label="Task id" max_length="40" name="u_task_id" type="string"/>
+        <element label="UserSys_id" max_length="32" name="u_usersys_id" text_index="true" type="string"/>
+    </element>
+</database>

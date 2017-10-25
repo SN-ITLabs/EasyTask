@@ -3,7 +3,7 @@
     <sys_script_include action="INSERT_OR_UPDATE">
         <access>package_private</access>
         <active>true</active>
-        <api_name>x_snc_subscribed_f.getIncidents</api_name>
+        <api_name>x_snc_easytask.getIncidents</api_name>
         <client_callable>false</client_callable>
         <description>Gets all Incidents related to an user</description>
         <name>getIncidents</name>
@@ -19,7 +19,7 @@
 			task_dec = _userTasks.result[j].short_description.toString().length < _userTasks.result[j].short_description.toString().substring(0,24) ? _userTasks.result[j].short_description.toString() + '.' : _userTasks.result[j].short_description.toString().substring(0,24) + '...';
 		var _today_logged_hours = 0;
 		var _logged_hours_till_today = 0;
-		gr = new GlideRecord('x_snc_subscribed_f_mailresponsepayload');
+		gr = new GlideRecord('x_snc_easytask_mailresponsepayload');
 		gr.addQuery('u_task_id','=',_userTasks.result[j].number.toString());
 		gr.query();
 		if(gr.hasNext()){
@@ -62,10 +62,10 @@
         <sys_id>e853f5c66f8d0b00f928c8c17c3ee44e</sys_id>
         <sys_mod_count>9</sys_mod_count>
         <sys_name>getIncidents</sys_name>
-        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy>read</sys_policy>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
-        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_include_e853f5c66f8d0b00f928c8c17c3ee44e</sys_update_name>
         <sys_updated_by>souvik</sys_updated_by>
         <sys_updated_on>2017-09-12 09:15:04</sys_updated_on>

@@ -3,7 +3,7 @@
     <sys_script_include action="INSERT_OR_UPDATE">
         <access>package_private</access>
         <active>true</active>
-        <api_name>x_snc_subscribed_f.getDefects</api_name>
+        <api_name>x_snc_easytask.getDefects</api_name>
         <client_callable>false</client_callable>
         <description>Gets all Defects for a particular user!</description>
         <name>getDefects</name>
@@ -29,7 +29,7 @@
 		var time_worked = 0;
 		if(_userTasks.result[j].time_worked !== '')
 			time_worked = Number(_userTasks.result[j].time_worked.split(' ')[1].split(':')[0]);
-		gr = new GlideRecord('x_snc_subscribed_f_mailresponsepayload');
+		gr = new GlideRecord('x_snc_easytask_mailresponsepayload');
 		gr.addQuery('u_task_id','=',_userTasks.result[j].number.toString());
 		gr.query();
 		if(gr.hasNext()){
@@ -74,10 +74,10 @@
         <sys_id>fb0335c66f8d0b00f928c8c17c3ee4d2</sys_id>
         <sys_mod_count>24</sys_mod_count>
         <sys_name>getDefects</sys_name>
-        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy>read</sys_policy>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
-        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_include_fb0335c66f8d0b00f928c8c17c3ee4d2</sys_update_name>
         <sys_updated_by>souvik</sys_updated_by>
         <sys_updated_on>2017-09-12 12:10:54</sys_updated_on>

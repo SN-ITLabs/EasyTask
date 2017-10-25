@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <element label="SubscribedForEmailNotifications" max_length="40" name="x_snc_easytask_subscribedforemailnotifications" type="collection">
+        <element label="Active" max_length="40" name="u_active" type="boolean"/>
+        <element label="DevSysID" max_length="32" name="u_devsysid" type="string"/>
+        <element label="Email" max_length="30" name="u_email" type="string"/>
+        <element label="First name" max_length="32" name="u_first_name" type="string"/>
+    </element>
+</database>

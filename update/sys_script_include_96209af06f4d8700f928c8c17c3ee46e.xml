@@ -3,18 +3,22 @@
     <sys_script_include action="INSERT_OR_UPDATE">
         <access>package_private</access>
         <active>true</active>
-        <api_name>x_snc_subscribed_f.createTasksViaRest</api_name>
+        <api_name>x_snc_easytask.createTasksViaRest</api_name>
         <client_callable>false</client_callable>
         <description>Create a new task parsed from the Email</description>
         <name>createTasksViaRest</name>
         <script><![CDATA[function createTasksViaRest(createTasksJSON,email_id){
+	var restMessageDetails = new RESTMessageSetup();
 	var restMessage = new sn_ws.RESTMessageV2();
-	restMessage.setBasicAuth("souvik.ghosh","iWcMyPwde4d!");
-	restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/sys_user');
+	var endpointBase = 'https://' + gs.getProperty('x_snc_easytask.surf_instance_name') + '.service-now.com/api/now/table/';
+	restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
+	restMessage.setEndpoint(endpointBase+'sys_user');
 	restMessage.setQueryParameter('sysparm_query','email='+email_id);
 	restMessage.setHttpMethod('GET');
 	var userDetails = JSON.parse(restMessage.execute().getBody()).result[0].sys_id;
-	restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/rm_scrum_task');
+	restMessage = new sn_ws.RESTMessageV2();
+	restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
+	restMessage.setEndpoint(endpointBase+'rm_scrum_task');
 	restMessage.setHttpMethod('POST');
 	restMessage.setRequestHeader('Content-Type','application/json');
 	restMessage.setRequestHeader('Accept','application/json');
@@ -30,8 +34,17 @@
 				story: createTasksJSON[tasks].taskAttributes.story,
 				assigned_to: userDetails
 			};
+			
 			restMessage.setRequestBody(JSON.stringify(_task));
 			var _responseCode = restMessage.execute();
+			restMessage = new sn_ws.RESTMessageV2();
+			restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
+			restMessage.setEndpoint(endpointBase+'rm_scrum_task');
+			restMessage.setRequestHeader('Content-Type','application/json');
+			restMessage.setRequestHeader('Accept','application/json');
+			restMessage.setHttpMethod('PUT');
+			restMessage.setRequestBody(JSON.stringify({short_description: createTasksJSON[tasks].taskAttributes.short_description}));
+			_responseCode = restMessage.execute();
 			var _response = JSON.parse(_responseCode.getBody());
 			response[tasks] = {
 				status: _responseCode.getStatusCode(),
@@ -40,7 +53,7 @@
 					story: _response.result.story.link,
 					type: _response.result.type,
 					short_description: _response.result.short_description,
-					state: _response.result.state,
+					state: getChoices('rm_scrum_task',_response.result.state,''),
 					planned_hours: _response.result.planned_hours,
 					hours: _response.result.hours,
 					sys_id: _response.result.sys_id
@@ -49,6 +62,7 @@
 			};
 		}
 	}
+	gs.info('Woohoo : '+JSON.stringify(response));
 	return response;
 }]]></script>
         <sys_class_name>sys_script_include</sys_class_name>
@@ -56,14 +70,14 @@
         <sys_created_on>2017-09-04 14:12:17</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>96209af06f4d8700f928c8c17c3ee46e</sys_id>
-        <sys_mod_count>22</sys_mod_count>
+        <sys_mod_count>28</sys_mod_count>
         <sys_name>createTasksViaRest</sys_name>
-        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy>read</sys_policy>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
-        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_include_96209af06f4d8700f928c8c17c3ee46e</sys_update_name>
         <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-09-05 13:13:40</sys_updated_on>
+        <sys_updated_on>2017-10-25 10:13:42</sys_updated_on>
     </sys_script_include>
 </record_update>

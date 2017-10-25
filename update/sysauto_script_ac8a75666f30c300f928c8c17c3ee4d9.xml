@@ -11,57 +11,83 @@
         <run_dayofweek>1</run_dayofweek>
         <run_period/>
         <run_start>2017-08-28 12:20:59</run_start>
-        <run_time>1970-01-01 14:30:00</run_time>
+        <run_time>1970-01-01 13:30:00</run_time>
         <run_type>daily</run_type>
         <script><![CDATA[var scheduler = {};
 scheduler.getTasksByAssignedTo = function(){
+	var restMessageDetails = new RESTMessageSetup();
 	var restMessage = new sn_ws.RESTMessageV2();
-	restMessage.setBasicAuth("souvik.ghosh","iWcMyPwde4d!");
+	var endpointBase = 'https://' + gs.getProperty('x_snc_easytask.surf_instance_name') + '.service-now.com/api/now/table/';
+	restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
 	restMessage.setHttpMethod('get');
-	restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/x_snc_tasklogfrome_subscribedformail');
-	restMessage.setQueryParameter('sysparm_query','u_email_tasks=1');
-	var response = restMessage.execute();
-	var parser = JSON.parse(response.getBody());
-	var _task,_defect,_incident;
-	for (var i =0; i<parser.result.length; i++){
-		restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/rm_scrum_task');
-		restMessage.setQueryParameter('sysparm_query','active=true^assigned_to='+parser.result[i].u_user_subscribed.value);
-		var _userTasks = JSON.parse(restMessage.execute().getBody());
-		restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/rm_defect');
-		restMessage.setQueryParameter('sysparm_query','active=true^assigned_to='+parser.result[i].u_user_subscribed.value);
-		var _userDefects = JSON.parse(restMessage.execute().getBody());
-		restMessage.setEndpoint('https://surfdev.service-now.com/api/now/table/incident');
-		restMessage.setQueryParameter('sysparm_query','active=true^assigned_to='+parser.result[i].u_user_subscribed.value);
-		var _userIncidents = JSON.parse(restMessage.execute().getBody());
-		restMessage.setEndpoint(parser.result[i].u_user_subscribed.link);
-		var _userDetails = JSON.parse(restMessage.execute().getBody());
-		var user = _userDetails.result.email.toString();
+	var gr = new GlideRecord('x_snc_easytask_subscribedforemailnotifications');
+	gr.addQuery('u_active',true);
+	gr.query();
+	var _task,_defect,_incident,result,_userTasks,_userDefects,_userIncidents;
+	while(gr.next()){
+		restMessage.setEndpoint(endpointBase + 'rm_scrum_task');
+		restMessage.setQueryParameter('sysparm_query','active=true^assigned_to='+gr.u_devsysid+'^ORDERBYnumber');
+		result = restMessage.execute();
+		
+		if(result && result.getBody()) 
+			_userTasks = JSON.parse(result.getBody());
+		
+		
+		/*restMessage = new sn_ws.RESTMessageV2();
+		restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
+		restMessage.setHttpMethod('get');
+		restMessage.setEndpoint(endpointBase + 'rm_defect');
+		restMessage.setQueryParameter('sysparm_query','active=true^assigned_to='+gr.u_devsysid+'^ORDERBYnumber');
+		result = restMessage.execute();
+		
+		if(result && result.getBody()) 
+			_userDefects = JSON.parse(result.getBody());
+		
+		
+		restMessage = new sn_ws.RESTMessageV2();
+		restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
+		restMessage.setHttpMethod('get');
+		restMessage.setEndpoint(endpointBase + 'incident_task');
+		restMessage.setQueryParameter('sysparm_query','active=true^assigned_to='+gr.u_devsysid+'^ORDERBYnumber');
+		result = restMessage.execute();
+		
+		if(result && result.getBody()) 
+			_userIncidents = JSON.parse(result.getBody());*/
+		
+		var user = gr.u_email;
+		
 		try{
-			_task = getScrumTasks(_userTasks,restMessage);
+			_task = getScrumTasks(_userTasks);
 		}
 		catch(err){
+			gs.error('Tasks Not Found: '+ err.toString());
 			_task = {};
 		}
+		
 		try{
-			_defect = getDefects(_userDefects,restMessage);
+			_defect = getDefects(_userDefects);
 		}
 		catch(err){
+			gs.error('Defects Not Found: '+ err.toString());
 			_defect = {};
 		}
+		
 		try{
-			_incident = getIncidents(_userIncidents,restMessage);
+			_incident = getIncidents(_userIncidents);
 		}
 		catch(err){
+			gs.error('Incidents Not Found: '+ err.toString());
 			_incident = {};
 		}
+		
 		var tasks = {
-			first_name: _userDetails.result.first_name.toString(),
+			first_name: gr.u_first_name.toString(),
 			scrumTasks: _task,
 			defects: _defect,
 			incidents: _incident
 		};
 		//Event is firing
-		gs.eventQueue('x_snc_subscribed_f.logWorkHours', current, JSON.stringify(user), JSON.stringify(tasks));
+		gs.eventQueue('x_snc_easytask.logWorkHours', current, user, JSON.stringify(tasks));
 		
 	}
 };
@@ -72,15 +98,15 @@ scheduler.getTasksByAssignedTo();]]></script>
         <sys_created_on>2017-08-28 12:21:42</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>ac8a75666f30c300f928c8c17c3ee4d9</sys_id>
-        <sys_mod_count>111</sys_mod_count>
+        <sys_mod_count>124</sys_mod_count>
         <sys_name>Update Tasks Reminder</sys_name>
-        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
-        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sysauto_script_ac8a75666f30c300f928c8c17c3ee4d9</sys_update_name>
         <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-09-18 08:18:25</sys_updated_on>
+        <sys_updated_on>2017-10-23 14:59:45</sys_updated_on>
         <upgrade_safe>false</upgrade_safe>
     </sysauto_script>
 </record_update>

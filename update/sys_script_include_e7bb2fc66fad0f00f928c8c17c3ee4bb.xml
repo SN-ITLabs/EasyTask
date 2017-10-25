@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_snc_easytask.getChoices</api_name>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>getChoices</name>
+        <script><![CDATA[var getChoices = function(name,value,label){
+	
+	var gr = new GlideRecord('x_snc_easytask_choicelist');
+		gr.addQuery('u_table_name',name);
+		gr.addQuery('u_state',value);
+		gr.query();
+		if(gr.hasNext()){
+			gr.next();
+			if(label != ''){
+				gr.u_display_value = label;
+				gr.update();
+			}
+			else
+				return gr.u_display_value.toString();
+		}
+		else{
+			gr.initialize();
+			gr.u_table_name = name.toString();
+			gr.u_state = Number(value);
+			gr.u_display_value = label.toString();
+			gr.insert();
+		}
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>souvik</sys_created_by>
+        <sys_created_on>2017-10-03 14:06:57</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>e7bb2fc66fad0f00f928c8c17c3ee4bb</sys_id>
+        <sys_mod_count>13</sys_mod_count>
+        <sys_name>getChoices</sys_name>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_script_include_e7bb2fc66fad0f00f928c8c17c3ee4bb</sys_update_name>
+        <sys_updated_by>souvik</sys_updated_by>
+        <sys_updated_on>2017-10-11 08:30:27</sys_updated_on>
+    </sys_script_include>
+</record_update>

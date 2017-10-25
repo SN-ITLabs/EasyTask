@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_email">
+    <sys_script_email action="INSERT_OR_UPDATE">
+        <name>sendSubscriptionStatus</name>
+        <new_lines_to_html>false</new_lines_to_html>
+        <script><![CDATA[(function runMailScript(/* GlideRecord */ current, /* TemplatePrinter */ template,
+          /* Optional EmailOutbound */ email, /* Optional GlideRecord */ email_action,
+          /* Optional GlideRecord */ event) {
+	
+	var status = 'shall no longer receive daily task update notification.<br/><br/><br/>Please send an email to demoplace+subscribe@service-now.com to subscribe again.';
+	
+	if(current.u_active)
+		status = 'are now subscribed to receive daily notifications about tasks assigned to you, and have an option to update or create new tasks by just replying to the mail. Thank you and welcome onboard!!<br/><br/><br/>To unsubscribe send an email to demoplace+unsubscribe@service-now.com';
+	email.setSubject('Re: '+event.parm2.toString());
+	
+	template.print('Hi ' + current.u_first_name + ',<br/><br/>You ' + status);
+	
+})(current, template, email, email_action, event);]]></script>
+        <sys_class_name>sys_script_email</sys_class_name>
+        <sys_created_by>souvik</sys_created_by>
+        <sys_created_on>2017-10-11 13:04:44</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>0388a0bc6fb54340f928c8c17c3ee4d5</sys_id>
+        <sys_mod_count>8</sys_mod_count>
+        <sys_name>sendSubscriptionStatus</sys_name>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_script_email_0388a0bc6fb54340f928c8c17c3ee4d5</sys_update_name>
+        <sys_updated_by>souvik</sys_updated_by>
+        <sys_updated_on>2017-10-11 18:24:40</sys_updated_on>
+    </sys_script_email>
+</record_update>

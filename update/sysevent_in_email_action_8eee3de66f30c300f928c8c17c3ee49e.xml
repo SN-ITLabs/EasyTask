@@ -16,7 +16,7 @@
         <script><![CDATA[(function runAction(/*GlideRecord*/ current, /*GlideRecord*/ event, /*EmailWrapper*/ email, /*ScopedEmailLogger*/ logger, /*EmailClassifier*/ classifier) {
 	// Implement email action here
 	
-	var regexFromMobile= new RegExp(/STSK\d{7};[\w+]*;[\w\s]+(\.{3})*;[\w\s]+(\.{3})*;(\d|-\d);\d+;\d+;/gm);
+	var regexFromMobile= new RegExp(/STSK\d{7};[\w+]*;[\w\s&;]+(\.{3})*;[\w\s]+(\.{3})*;(\d|-\d);\d+;\d+;/gm);
 	var newTaskFromMobile = new RegExp(/new_task\d;[\w+]*;STRY\d{7};[\w\s]+;(\d|-\d);\d+;\d+;/gm);
 	var regexForDefect = new RegExp(/(id\=\"DFCT\d{7}\")[><\w\s=\"\-:\/,;]*<\/td>/gm);
 	var regexForDefectMobile = new RegExp(/DFCT\d{7};[\w+]*;[\w\s]+(\.{3})*;[\w\s]+(\.{3})*;(\d|-\d);\d+;\d+;/gm);
@@ -28,6 +28,7 @@
 	var createTasksJSON = extractJSONFromEmailResponse(email.body_html,newTaskFromMobile,regexToParseNewTask);
 	var formDefectResponse = extractJSONFromEmailResponse(email.body_html,regexForDefectMobile,regexForDefect);
 	var incidentResponseJSON = extractJSONFromEmailResponse(email.body_html,regexForIncidentMobile,regexForIncident);
+	gs.info(JSON.stringify(createTasksJSON));
 	var _response_incident = updateIncidentsViaRest(incidentResponseJSON);
 	updatePayloadTable(_response_incident);
 	var _response_defect = updatesDefectsViaRest(formDefectResponse);
@@ -48,7 +49,7 @@
 			response_incident : _response_incident
 		}
 	};
-	gs.eventQueue('x_snc_subscribed_f.acknowledgeTaskRespon', current, email.from, JSON.stringify(response));
+	gs.eventQueue('x_snc_easytask.acknowledgeTaskRespon', current, email.from, JSON.stringify(response));
 })(current, event, email, logger, classifier);]]></script>
         <stop_processing>false</stop_processing>
         <sys_class_name>sysevent_in_email_action</sys_class_name>
@@ -58,16 +59,16 @@
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>8eee3de66f30c300f928c8c17c3ee49e</sys_id>
-        <sys_mod_count>136</sys_mod_count>
+        <sys_mod_count>142</sys_mod_count>
         <sys_name>UpdateOrCreateTasks</sys_name>
         <sys_overrides/>
-        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
-        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sysevent_in_email_action_8eee3de66f30c300f928c8c17c3ee49e</sys_update_name>
         <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-09-11 11:25:54</sys_updated_on>
+        <sys_updated_on>2017-10-11 16:53:36</sys_updated_on>
         <table>sysauto_script</table>
         <template/>
         <type>reply</type>

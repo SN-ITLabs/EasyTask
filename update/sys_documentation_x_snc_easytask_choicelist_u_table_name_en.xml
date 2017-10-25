@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update>
+    <sys_documentation element="u_table_name" label="Table name" language="en" table="x_snc_easytask_choicelist">
+        <sys_documentation action="INSERT_OR_UPDATE">
+            <element>u_table_name</element>
+            <help/>
+            <hint/>
+            <label>Table name</label>
+            <language>en</language>
+            <name>x_snc_easytask_choicelist</name>
+            <plural>Table names</plural>
+            <sys_class_name>sys_documentation</sys_class_name>
+            <sys_created_by>souvik</sys_created_by>
+            <sys_created_on>2017-10-03 13:16:50</sys_created_on>
+            <sys_customer_update>false</sys_customer_update>
+            <sys_id>2580ab426fad0f00f928c8c17c3ee4b6</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>Table name</sys_name>
+            <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+            <sys_policy/>
+            <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+            <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+            <sys_update_name>sys_documentation_x_snc_easytask_choicelist_u_table_name_en</sys_update_name>
+            <sys_updated_by>souvik</sys_updated_by>
+            <sys_updated_on>2017-10-03 13:16:50</sys_updated_on>
+            <url/>
+            <url_target/>
+        </sys_documentation>
+    </sys_documentation>
+</record_update>

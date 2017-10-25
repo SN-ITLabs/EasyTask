@@ -6,11 +6,11 @@
         <active>true</active>
         <advanced_condition/>
         <affected_field_on_event/>
-        <collection>x_snc_subscribed_f_mailresponsepayload</collection>
+        <collection>x_snc_easytask_mailresponsepayload</collection>
         <condition/>
         <content_type>text/html</content_type>
         <description/>
-        <event_name>x_snc_subscribed_f.acknowledgeTaskRespon</event_name>
+        <event_name>x_snc_easytask.acknowledgeTaskRespon</event_name>
         <event_parm_1>true</event_parm_1>
         <event_parm_2>false</event_parm_2>
         <exclude_delegates>false</exclude_delegates>
@@ -51,10 +51,10 @@
         <sys_mod_count>2</sys_mod_count>
         <sys_name>SendAcknowledgement</sys_name>
         <sys_overrides/>
-        <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
-        <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sysevent_email_action_c85fca736ff04700f928c8c17c3ee424</sys_update_name>
         <sys_updated_by>souvik</sys_updated_by>
         <sys_updated_on>2017-09-07 11:29:39</sys_updated_on>

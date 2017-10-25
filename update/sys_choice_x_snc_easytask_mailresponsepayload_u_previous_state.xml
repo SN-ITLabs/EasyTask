@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update>
+    <sys_choice action="INSERT_OR_UPDATE" field="u_previous_state" table="x_snc_easytask_mailresponsepayload" version="3">
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>u_previous_state</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Draft</label>
+            <language>en</language>
+            <name>x_snc_easytask_mailresponsepayload</name>
+            <sequence>0</sequence>
+            <sys_created_by>souvik</sys_created_by>
+            <sys_created_on>2017-09-08 07:30:17</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>d971ed8e6f4d0b00f928c8c17c3ee499</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>souvik</sys_updated_by>
+            <sys_updated_on>2017-09-08 07:30:17</sys_updated_on>
+            <value>-6</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>u_previous_state</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Ready</label>
+            <language>en</language>
+            <name>x_snc_easytask_mailresponsepayload</name>
+            <sequence>1</sequence>
+            <sys_created_by>souvik</sys_created_by>
+            <sys_created_on>2017-09-08 07:30:17</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>9971ed8e6f4d0b00f928c8c17c3ee49a</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>souvik</sys_updated_by>
+            <sys_updated_on>2017-09-08 07:30:17</sys_updated_on>
+            <value>1</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>u_previous_state</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Work in progress</label>
+            <language>en</language>
+            <name>x_snc_easytask_mailresponsepayload</name>
+            <sequence>2</sequence>
+            <sys_created_by>souvik</sys_created_by>
+            <sys_created_on>2017-09-08 07:30:17</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>9571ed8e6f4d0b00f928c8c17c3ee49b</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>souvik</sys_updated_by>
+            <sys_updated_on>2017-09-08 07:30:17</sys_updated_on>
+            <value>2</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>u_previous_state</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Complete</label>
+            <language>en</language>
+            <name>x_snc_easytask_mailresponsepayload</name>
+            <sequence>3</sequence>
+            <sys_created_by>souvik</sys_created_by>
+            <sys_created_on>2017-09-08 07:30:17</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>9171ed8e6f4d0b00f928c8c17c3ee49c</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>souvik</sys_updated_by>
+            <sys_updated_on>2017-09-08 07:30:17</sys_updated_on>
+            <value>3</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>u_previous_state</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Cancelled</label>
+            <language>en</language>
+            <name>x_snc_easytask_mailresponsepayload</name>
+            <sequence>4</sequence>
+            <sys_created_by>souvik</sys_created_by>
+            <sys_created_on>2017-09-08 07:30:17</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>9d71ed8e6f4d0b00f928c8c17c3ee49c</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>souvik</sys_updated_by>
+            <sys_updated_on>2017-09-08 07:30:17</sys_updated_on>
+            <value>4</value>
+        </sys_choice>
+        <sys_choice_set action="INSERT_OR_UPDATE">
+            <element>u_previous_state</element>
+            <name>x_snc_easytask_mailresponsepayload</name>
+            <sys_class_name>sys_choice_set</sys_class_name>
+            <sys_created_by>souvik</sys_created_by>
+            <sys_created_on>2017-09-08 07:30:17</sys_created_on>
+            <sys_customer_update>false</sys_customer_update>
+            <sys_id>e4c2de60db028b40a86a5404ce9619a3</sys_id>
+            <sys_mod_count>2</sys_mod_count>
+            <sys_name>u_previous_state</sys_name>
+            <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+            <sys_policy/>
+            <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+            <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+            <sys_update_name>sys_choice_x_snc_easytask_mailresponsepayload_u_previous_state</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2017-10-09 04:30:32</sys_updated_on>
+        </sys_choice_set>
+    </sys_choice>
+</record_update>

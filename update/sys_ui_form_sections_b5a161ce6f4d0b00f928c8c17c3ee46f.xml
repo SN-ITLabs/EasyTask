@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <record_update>
-    <sys_ui_form_sections form_id="b5a161ce6f4d0b00f928c8c17c3ee46f" sys_domain="global" table="x_snc_subscribed_f_mailresponsepayload" version="3">
+    <sys_ui_form_sections form_id="b5a161ce6f4d0b00f928c8c17c3ee46f" sys_domain="global" table="x_snc_easytask_mailresponsepayload" version="3">
         <sys_ui_form_section action="INSERT_OR_UPDATE">
             <position>0</position>
             <sys_created_by>souvik</sys_created_by>
@@ -8,15 +8,15 @@
             <sys_domain>global</sys_domain>
             <sys_domain_path>/</sys_domain_path>
             <sys_id>fda161ce6f4d0b00f928c8c17c3ee471</sys_id>
-            <sys_mod_count>0</sys_mod_count>
+            <sys_mod_count>1</sys_mod_count>
             <sys_overrides/>
-            <sys_ui_form display_value="x_snc_subscribed_f_mailresponsepayload" name="x_snc_subscribed_f_mailresponsepayload" sys_domain="global" view="Default view">b5a161ce6f4d0b00f928c8c17c3ee46f</sys_ui_form>
-            <sys_ui_section caption="NULL" display_value="" name="x_snc_subscribed_f_mailresponsepayload" sys_domain="global" view="Default view">d13915786fc98700f928c8c17c3ee4d2</sys_ui_section>
-            <sys_updated_by>souvik</sys_updated_by>
-            <sys_updated_on>2017-09-08 07:31:07</sys_updated_on>
+            <sys_ui_form display_value="x_snc_easytask_mailresponsepayload" name="x_snc_easytask_mailresponsepayload" sys_domain="global" view="Default view">b5a161ce6f4d0b00f928c8c17c3ee46f</sys_ui_form>
+            <sys_ui_section caption="NULL" display_value="" name="x_snc_easytask_mailresponsepayload" sys_domain="global" view="Default view">c79ad1b86fc98700f928c8c17c3ee4af</sys_ui_section>
+            <sys_updated_by>chaitanya</sys_updated_by>
+            <sys_updated_on>2017-10-23 12:17:41</sys_updated_on>
         </sys_ui_form_section>
         <sys_ui_form action="INSERT_OR_UPDATE">
-            <name>x_snc_subscribed_f_mailresponsepayload</name>
+            <name>x_snc_easytask_mailresponsepayload</name>
             <roles/>
             <sys_class_name>sys_ui_form</sys_class_name>
             <sys_created_by>souvik</sys_created_by>
@@ -26,12 +26,12 @@
             <sys_domain_path>/</sys_domain_path>
             <sys_id>b5a161ce6f4d0b00f928c8c17c3ee46f</sys_id>
             <sys_mod_count>0</sys_mod_count>
-            <sys_name>x_snc_subscribed_f_mailresponsepayload</sys_name>
+            <sys_name>x_snc_easytask_mailresponsepayload</sys_name>
             <sys_overrides/>
-            <sys_package display_value="Subscribed for Mails" source="x_snc_subscribed_f">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+            <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
             <sys_policy/>
             <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
-            <sys_scope display_value="Subscribed for Mails">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+            <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
             <sys_update_name>sys_ui_form_sections_b5a161ce6f4d0b00f928c8c17c3ee46f</sys_update_name>
             <sys_updated_by>souvik</sys_updated_by>
             <sys_updated_on>2017-09-08 07:31:07</sys_updated_on>

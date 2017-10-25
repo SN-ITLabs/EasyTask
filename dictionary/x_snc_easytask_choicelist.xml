@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <element label="ChoiceList" max_length="40" name="x_snc_easytask_choicelist" type="collection">
+        <element label="Display value" max_length="40" name="u_display_value" type="string"/>
+        <element label="State" max_length="40" name="u_state" type="integer"/>
+        <element label="Table name" max_length="100" name="u_table_name" type="string"/>
+    </element>
+</database>
