@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_snc_easytask.GetUserTasks</api_name>
+        <client_callable>false</client_callable>
+        <description>Returns Different types of tasks assigned to Users</description>
+        <name>GetUserTasks</name>
+        <script><![CDATA[var GetUserTasks = Class.create();
+GetUserTasks.prototype = {
+    initialize: function() {
+    },
+	
+	getTaskShortDescription: function(short_description){
+		
+		var task_dec = '';
+		var regexRes = (/^((?:\S+\s+){5}\S+)/g).exec(short_description);
+			
+		if(regexRes != null && short_description.substring(0,34).length < regexRes[0].length)
+			task_dec = regexRes[0] + '...';
+		else
+			task_dec = short_description.length <= short_description.substring(0,34) ? short_description + '.' :short_description.substring(0,34) + '...';
+		
+		return task_dec;
+		
+	},
+	
+	getParentShortDescription: function(parent){
+		
+		var story_desc = '';
+		var _restParam = {
+			type: 'GET',
+			url: parent,
+			sysparm_fields: 'short_description'	
+		};
+		
+		var _rstUtil = new RestMessageUtil();
+		var _result = _rstUtil.executeGET(_restParam);
+		if(_result && _result != ''){
+			var regexResult = (/^((?:\S+\s+){5}\S+)/g).exec(_result.result.short_description.toString());
+			if(regexResult != null && _result.result.short_description.toString().substring(0,34).length > regexResult[0].length)
+				story_desc = regexResult[0] + '...';
+			else
+				story_desc = _result.result.short_description.toString().length <= _result.result.short_description.toString().substring(0,34) ? _result.result.short_description.toString() + '.' : _result.result.short_description.toString().substring(0,34) + '...';
+		}
+		
+		return story_desc;
+		
+	},
+	
+	getTimeWorked: function(time_worked,number){
+		
+		time_worked = new GlideDateTime(time_worked).getNumericValue();
+		time_worked = Number(time_worked/(3600*1000));
+		
+		var time = {
+			_today_logged_hours : 0,
+			_logged_hours_till_today : 0
+		};
+		
+		var gr = new GlideRecord('x_snc_easytask_mailresponsepayload');
+		gr.addQuery('u_task_id','=',number);
+		gr.query();
+			
+		if(gr.next()){
+			var _time_worked = new GlideDateTime(gr.u_timeworked).getNumericValue();
+			_time_worked = Number(_time_worked/(3600*1000));
+			time._today_logged_hours = Number(time_worked) - _time_worked;
+			time._logged_hours_till_today = Number(time_worked) - Number(time._today_logged_hours);
+		}
+		else{
+			time._today_logged_hours = Number(time_worked);
+		}
+		
+		return time;
+		
+	},
+	
+	getHours: function(hours,number){
+		
+		var time = {
+			_today_logged_hours : 0,
+			_logged_hours_till_today : 0
+		};
+		
+		var gr = new GlideRecord('x_snc_easytask_mailresponsepayload');
+		gr.addQuery('u_task_id','=',number);
+		gr.query();
+			
+		if(gr.next()){
+			time._today_logged_hours = Number(hours) - Number(gr.u_hours);
+			time._logged_hours_till_today = Number(hours) - time._today_logged_hours;
+		}
+		else{
+			time._today_logged_hours = Number(hours);
+		}
+		
+		return time;
+		
+	},
+	
+	getTasks: function(_userTasks,task_type) {
+
+		var _task = {taskDetails: []};
+		for(var j = 0;j<_userTasks.result.length;j++){
+			var task_dec = '',story_desc='';
+			
+			task_dec = this.getTaskShortDescription(_userTasks.result[j].short_description.toString());
+			
+			if(task_type == 'Development'){
+				story_desc = this.getParentShortDescription(_userTasks.result[j].story.link);
+				gs.info('story_desc: '+story_desc);
+			}
+			
+			if(task_type == 'IN'){
+				story_desc = this.getParentShortDescription(_userTasks.result[j].incident.link);
+				gs.info('IN story_desc: '+story_desc);
+			}
+
+			var time_worked = {
+				_today_logged_hours : 0,
+				_logged_hours_till_today : 0
+			};
+			
+			if(_userTasks.result[j].time_worked && _userTasks.result[j].time_worked != '' && task_type != 'Development'){
+				time_worked = this.getTimeWorked(_userTasks.result[j].time_worked.toString(),_userTasks.result[j].number.toString());
+			}
+			else if(_userTasks.result[j].hours && _userTasks.result[j].hours != '' && task_type == 'Development'){
+				time_worked = this.getHours(_userTasks.result[j].hours.toString(),_userTasks.result[j].number.toString());
+			}
+			
+			var _taskDetails = {
+				number: _userTasks.result[j].number.toString(),
+				task_type : task_type,
+				short_desc_ : story_desc,
+				short_description: task_dec,
+				state: _userTasks.result[j].state.toString(),
+				logged: time_worked._logged_hours_till_today.toString(),
+				today_hours: time_worked._today_logged_hours.toString()
+			};
+			
+			_task.taskDetails.push(_taskDetails);
+		}
+		return _task === undefined ? '':_task;
+	}, 
+
+    type: 'GetUserTasks'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>souvik.ghosh</sys_created_by>
+        <sys_created_on>2017-11-07 11:56:07</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>5b7d1bdd13564300b1123192e144b0e7</sys_id>
+        <sys_mod_count>26</sys_mod_count>
+        <sys_name>GetUserTasks</sys_name>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_script_include_5b7d1bdd13564300b1123192e144b0e7</sys_update_name>
+        <sys_updated_by>souvik.g</sys_updated_by>
+        <sys_updated_on>2017-11-16 15:04:27</sys_updated_on>
+    </sys_script_include>
+</record_update>

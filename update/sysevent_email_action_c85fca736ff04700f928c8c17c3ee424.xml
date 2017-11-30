@@ -28,7 +28,7 @@
 <p>&nbsp;</p>]]></message_html>
         <message_list/>
         <message_text/>
-        <name>SendAcknowledgement</name>
+        <name>Send acknowledgement</name>
         <omit_watermark>false</omit_watermark>
         <order>100</order>
         <push_message_only>false</push_message_only>
@@ -48,16 +48,16 @@
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>c85fca736ff04700f928c8c17c3ee424</sys_id>
-        <sys_mod_count>2</sys_mod_count>
-        <sys_name>SendAcknowledgement</sys_name>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_name>Send acknowledgement</sys_name>
         <sys_overrides/>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sysevent_email_action_c85fca736ff04700f928c8c17c3ee424</sys_update_name>
-        <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-09-07 11:29:39</sys_updated_on>
+        <sys_updated_by>souvik.ghosh</sys_updated_by>
+        <sys_updated_on>2017-10-26 07:03:48</sys_updated_on>
         <sys_version>2</sys_version>
         <template/>
         <type>email</type>

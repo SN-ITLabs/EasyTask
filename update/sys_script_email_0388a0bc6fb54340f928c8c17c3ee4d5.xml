@@ -7,13 +7,56 @@
           /* Optional EmailOutbound */ email, /* Optional GlideRecord */ email_action,
           /* Optional GlideRecord */ event) {
 	
-	var status = 'shall no longer receive daily task update notification.<br/><br/><br/>Please send an email to demoplace+subscribe@service-now.com to subscribe again.';
+	var status = 'shall no longer receive daily task update notification.<br/><br/><br/>Please send an email to tools4it+subscribe@service-now.com to subscribe again.';
 	
-	if(current.u_active)
-		status = 'are now subscribed to receive daily notifications about tasks assigned to you, and have an option to update or create new tasks by just replying to the mail. Thank you and welcome onboard!!<br/><br/><br/>To unsubscribe send an email to demoplace+unsubscribe@service-now.com';
+	if(current.u_active) {
+		
+		status = 'are now subscribed to receive daily notifications about tasks assigned to you, and have an option to update or create new tasks by just replying to the mail. Thank you and welcome onboard!!<br/><br/><br/>To unsubscribe send an email to tools4it+unsubscribe@service-now.com';
+	
+		var border = 'border: 1px solid #0368d4;';
+		var webKitBorder = '-webkit-border-radius: 3px;';
+		var mozBorder = '-moz-border-radius: 3px;';
+		var padding = 'padding: 15px;';
+		var width = 'width : 100px;';
+		var margin = 'margin : 15px;';
+		
+		template.print('Hi ' + current.u_first_name + ',<br/><br/>You ' + status);
+		
+		template.print('<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable"><tr><td align="left" valign="top"><table cellpadding="0" cellspacing="0" width="250px"><tr>');
+		
+		var choices = {};
+		var gr = new GlideRecord('x_snc_easytask_choicelist');
+		gr.addQuery('u_table_name','IN','rm_scrum_task,rm_defect,incident_task');
+		gr.orderBy('u_state');
+		gr.query();
+		while(gr.next()){
+			
+			if(!choices.hasOwnProperty(gr.u_table_name))
+				choices[gr.u_table_name] = {};
+			
+			choices[gr.u_table_name][gr.u_state] = gr.u_display_value.toString();
+		}
+		
+		template.print('<p>Please find the legend of the numeric state values for different types of tasks</p>');
+		var count = 0;
+		for (var _table in choices){
+			template.print('<tr><td style="'+border+webKitBorder+padding+mozBorder+'">');
+			if(count == 0) {
+				template.print('<p><strong>'+getTableNames(_table)+'</strong></p>');
+				count ++;
+			}
+			for(var _label in choices[_table]){
+				if(choices[_table][_label] != 0)
+					template.print('<p> '+ choices[_table][_label] + ' : '+ _label + '</p>');
+			}
+			template.print('</td></tr>');
+			count = 0;
+		}
+		template.print('</tr></td><tr></table>');
+	}
+	
 	email.setSubject('Re: '+event.parm2.toString());
 	
-	template.print('Hi ' + current.u_first_name + ',<br/><br/>You ' + status);
 	
 })(current, template, email, email_action, event);]]></script>
         <sys_class_name>sys_script_email</sys_class_name>
@@ -21,14 +64,14 @@
         <sys_created_on>2017-10-11 13:04:44</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>0388a0bc6fb54340f928c8c17c3ee4d5</sys_id>
-        <sys_mod_count>8</sys_mod_count>
+        <sys_mod_count>31</sys_mod_count>
         <sys_name>sendSubscriptionStatus</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_email_0388a0bc6fb54340f928c8c17c3ee4d5</sys_update_name>
-        <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-10-11 18:24:40</sys_updated_on>
+        <sys_updated_by>souvik.ghosh</sys_updated_by>
+        <sys_updated_on>2017-10-30 09:33:08</sys_updated_on>
     </sys_script_email>
 </record_update>

@@ -7,7 +7,7 @@
         <client_callable>false</client_callable>
         <description>On Demand Script to parse Email Response Text</description>
         <name>extractJSONFromEmailResponse</name>
-        <script><![CDATA[function extractJSONFromEmailResponse(emailString,regex, regex2){
+        <script><![CDATA[function extractJSONFromEmailResponse(emailString,regex, regex2, regex3){
 	var tasks = {};
 	var j = 0;
 	while((regexResults = regex.exec(emailString)) != null){
@@ -32,34 +32,83 @@
 		}
 	}
 	if(regex.exec(emailString) == null)
-		tasks = _formEmailResponseJSON(emailString.replace(/\r?\n|\r/gm,""),regex2);
+		tasks = _formEmailResponseJSON(emailString.replace(/\r?\n|\r/gm,""),regex2,regex3);
 	return tasks;
 }
-var _formEmailResponseJSON = function(emailString,regex){
+
+var isEmpty = function(obj) {
+    for(var prop in obj) {
+        if(obj.hasOwnProperty(prop))
+            return false;
+    }
+
+    return true;
+};
+
+var _formEmailResponseJSON = function(emailString,regex,_regex){
 	var tasks = {};
 	var i = 0;
 	while((regexResults = regex.exec(emailString)) != null){
 		var _taskid = replaceAll((regexResults[1].split('='))[1].toString(),'\"','');
-		if(!tasks.hasOwnProperty(_taskid)){
-			tasks[_taskid] = {
-				taskAttributes : {}
-			};
-			i = 0;
-		}
 		var _taskAttribute = _extractAttributesFromHtmlTags(regexResults["0"]);
-		if(regex + "" == regexToParseNewTask + ""){
-			if(checkDemoString.indexOf(_taskAttribute) > -1 && regex.toString() == regexToParseNewTask.toString())
-				_taskAttribute = '';
-			tasks[_taskid].taskAttributes[arr_new_task[i]] = _taskAttribute;
+		if(_taskAttribute != ''){
+			if(!tasks.hasOwnProperty(_taskid)){
+				tasks[_taskid] = {
+					taskAttributes : {}
+				};
+				i = 0;
+			}
+			if(_taskAttribute.indexOf(':') != -1)
+				 _taskAttribute = replaceAll(_taskAttribute,'\:','\.');
+			if(regex + "" == regexToParseNewTask + ""){
+				if(checkDemoString.indexOf(_taskAttribute) > -1 && regex.toString() == regexToParseNewTask.toString())
+					_taskAttribute = '';
+				tasks[_taskid].taskAttributes[arr_new_task[i]] = _taskAttribute;
+			}
+			else{
+				tasks[_taskid].taskAttributes[arr[i]] = _taskAttribute;
+			}
 		}
-		else
-			tasks[_taskid].taskAttributes[arr[i]] = _taskAttribute;
+		i++;
+	}
+	
+	if(isEmpty(tasks)){
+		tasks = _validateDifferentRegex(emailString,_regex);
+	}
+	return tasks;
+};
+
+var _validateDifferentRegex = function(emailString,regex){
+	var tasks = {};
+	var i = 0;
+	while((regexResults = regex.exec(emailString)) != null){
+		var _taskid = replaceAll((regexResults[1].split('='))[1].toString(),'\"','');
+		var _taskAttribute = regexResults["0"].substring(regexResults["0"].indexOf('>')+1,regexResults["0"].indexOf('</'));
+		if(_taskAttribute != ''){
+			if(!tasks.hasOwnProperty(_taskid)){
+				tasks[_taskid] = {
+					taskAttributes : {}
+				};
+				i = 0;
+			}
+			if(_taskAttribute.indexOf(':') != -1)
+				 _taskAttribute = replaceAll(_taskAttribute,'\:','\.');
+			if(regex + "" == _regexToParseNewTask + ""){
+				if(checkDemoString.indexOf(_taskAttribute) > -1 && regex.toString() == _regexToParseNewTask.toString())
+					_taskAttribute = '';
+				tasks[_taskid].taskAttributes[arr_new_task[i]] = _taskAttribute;
+			}
+			else{
+				tasks[_taskid].taskAttributes[arr[i]] = _taskAttribute;
+			}
+		}
 		i++;
 	}
 	return tasks;
 };
 var newTaskFromMobile = new RegExp(/new_task\d;[\w+]*;STRY\d{7};[\w\s]+;(\d|-\d);\d+;\d+/gm);
 var regexToParseNewTask = new RegExp(/(id\=\"new_task\d\")[><\w\s=\"\-:\/,;]*<\/td>/gm);
+var _regexToParseNewTask = new RegExp(/(id\=\"new_task\d\")>((\d+|(\d+\.\d+)|(\-\d+))|([\w\s\'\",;&@\\\/]+))<\/td>/gm);
 var checkDemoString = ['Enter Planned Hours','Type of Task','Enter Short Description','Enter Task State','Hours to log','Enter Story Details'];
 var arr = ['task_type','state','logged_hours','hours'];
 var arr_new_task = ['task_type','story','short_description','state','planned_hours','hours'];
@@ -81,14 +130,14 @@ var replaceAll = function(str,search,replacement){
         <sys_created_on>2017-08-31 17:43:50</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>398f1a2b6f3c0700f928c8c17c3ee43e</sys_id>
-        <sys_mod_count>37</sys_mod_count>
+        <sys_mod_count>56</sys_mod_count>
         <sys_name>extractJSONFromEmailResponse</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy>read</sys_policy>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_include_398f1a2b6f3c0700f928c8c17c3ee43e</sys_update_name>
-        <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-10-23 15:52:46</sys_updated_on>
+        <sys_updated_by>souvik.ghosh</sys_updated_by>
+        <sys_updated_on>2017-11-14 08:59:11</sys_updated_on>
     </sys_script_include>
 </record_update>

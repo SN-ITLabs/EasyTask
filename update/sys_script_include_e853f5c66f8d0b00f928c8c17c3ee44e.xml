@@ -7,45 +7,59 @@
         <client_callable>false</client_callable>
         <description>Gets all Incidents related to an user</description>
         <name>getIncidents</name>
-        <script><![CDATA[function getIncidents(_userTasks,restMessage) {
-	var gr;
+        <script><![CDATA[function getIncidents(_userTasks) {
+	var restMessageDetails = new RESTMessageSetup();
+	var restMessage = new sn_ws.RESTMessageV2();
+	var endpointBase = 'https://' + gs.getProperty('x_snc_easytask.surf_instance_name') + '.service-now.com/api/now/table/';
+	restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
+	restMessage.setHttpMethod('get');
+	
+	
+	var gr,result,story_details;
 	var _task = {taskDetails: []};
 	for(var j = 0;j<_userTasks.result.length;j++){
-		var regexRes = (/^((?:\S+\s+){2}\S+)/g).exec(_userTasks.result[j].short_description.toString());
-		var task_dec;
-		if(regexRes != null && _userTasks.result[j].short_description.toString().substring(0,24).length < regexRes.length)
+		restMessage.setEndpoint(_userTasks.result[j].incident.link);
+		result = restMessage.execute();
+		var story_desc = '', task_dec = '';
+		if(result && result.getBody()) {
+			story_details = JSON.parse(result.getBody());
+			var regexResult = (/^((?:\S+\s+){5}\S+)/g).exec(story_details.result.short_description.toString());
+			if(regexResult != null && story_details.result.short_description.toString().substring(0,34).length < regexResult[0].length)
+				story_desc = regexResult[0] + '...';
+			else
+				story_desc = story_details.result.short_description.toString().length <= story_details.result.short_description.toString().substring(0,34) ? story_details.result.short_description.toString() + '.' : story_details.result.short_description.toString().substring(0,34) + '...';
+		}
+		var regexRes = (/^((?:\S+\s+){5}\S+)/g).exec(_userTasks.result[j].short_description.toString());
+		if(regexRes != null && _userTasks.result[j].short_description.toString().substring(0,34).length < regexRes[0].length)
 			task_dec = regexRes[0] + '...';
 		else
-			task_dec = _userTasks.result[j].short_description.toString().length < _userTasks.result[j].short_description.toString().substring(0,24) ? _userTasks.result[j].short_description.toString() + '.' : _userTasks.result[j].short_description.toString().substring(0,24) + '...';
+			task_dec = _userTasks.result[j].short_description.toString().length < _userTasks.result[j].short_description.toString().substring(0,34) ? _userTasks.result[j].short_description.toString() + '.' : _userTasks.result[j].short_description.toString().substring(0,34) + '...';
+		
+		var time_worked = 0;
+		if(_userTasks.result[j].time_worked !== ''){
+			time_worked = new GlideDateTime(_userTasks.result[j].time_worked).getNumericValue();
+			time_worked = Number(time_worked/(3600*1000));
+		}
+		
 		var _today_logged_hours = 0;
 		var _logged_hours_till_today = 0;
 		gr = new GlideRecord('x_snc_easytask_mailresponsepayload');
 		gr.addQuery('u_task_id','=',_userTasks.result[j].number.toString());
 		gr.query();
-		if(gr.hasNext()){
-			while(gr.next()){
-				_today_logged_hours = Number(_userTasks.result[j].actual_time_worked) - Number(gr.u_hours);
-				_logged_hours_till_today = Number(_userTasks.result[j].actual_time_worked) - _today_logged_hours;
-				gr.u_previous_hours = gr.u_hours;
-				gr.u_previous_state = gr.u_state;
-				gr.u_state = Number(_userTasks.result[j].state);
-				gr.u_hours = Number(_userTasks.result[j].hours);
-				gr.update();
-			}
+		
+		if(gr.next()){
+			_today_logged_hours = time_worked - Number(gr.u_hours);
+			_logged_hours_till_today = time_worked - _today_logged_hours;
+			
 		}
 		else{
-			gr.u_hours = Number(_userTasks.result[j].actual_time_worked);
-			gr.u_state = Number(_userTasks.result[j].state);
-			gr.u_previous_hours = gr.u_hours;
-			gr.u_previous_state = gr.u_state;
-			gr.u_task_id = _userTasks.result[j].number.toString();
-			_today_logged_hours = gr.u_hours;
-			gr.insert();
+			_today_logged_hours = time_worked;
+			
 		}
 		var _taskDetails = {
 			number: _userTasks.result[j].number.toString(),
 			task_type : 'Incident',
-			short_desc_ : 'N/A',
+			short_desc_ : story_desc,
 			short_description: task_dec,
 			state: _userTasks.result[j].state.toString(),
 			logged: _logged_hours_till_today.toString(),
@@ -60,14 +74,14 @@
         <sys_created_on>2017-09-08 08:48:50</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>e853f5c66f8d0b00f928c8c17c3ee44e</sys_id>
-        <sys_mod_count>9</sys_mod_count>
+        <sys_mod_count>20</sys_mod_count>
         <sys_name>getIncidents</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy>read</sys_policy>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_include_e853f5c66f8d0b00f928c8c17c3ee44e</sys_update_name>
-        <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-09-12 09:15:04</sys_updated_on>
+        <sys_updated_by>souvik.ghosh</sys_updated_by>
+        <sys_updated_on>2017-11-07 11:01:25</sys_updated_on>
     </sys_script_include>
 </record_update>

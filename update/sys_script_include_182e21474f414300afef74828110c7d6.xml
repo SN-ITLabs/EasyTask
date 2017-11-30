@@ -19,43 +19,54 @@
 	gs.info("Param: "+queryParamString);
 	var restMessage = new sn_ws.RESTMessageV2();
 	var restMessageDetails = new RESTMessageSetup();
+	var endpointBase = 'https://' + gs.getProperty('x_snc_easytask.surf_instance_name') + '.service-now.com/api/now/table/';
 	restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
 	restMessage.setHttpMethod('GET');
-	restMessage.setEndpoint(restMessageDetails.getInstance() + 'incident');
-	restMessage.setQueryParameter('sysparm_query',queryParamString);
+	restMessage.setEndpoint(endpointBase + 'incident_task');
+	restMessage.setQueryParameter('sysparm_query',queryParamString+'^ORDERBYnumber');
 	restMessage.setQueryParameter('sysparm_fields',queryKeys);
-	var responseScrumTasks = JSON.parse(restMessage.execute().getBody());
+	var responseIncidentTasks = restMessage.execute();
+	var response = {};
+	if(responseIncidentTasks && responseIncidentTasks.getBody()){
+		responseIncidentTasks = JSON.parse(responseIncidentTasks.getBody());
 	var result_counter = 0;
 	var task = {};
-	var response = {};
 	for (var eachTask in incidentResponseJSON){
-		var _hours = Number(incidentResponseJSON[eachTask].taskAttributes.hours) + Number(incidentResponseJSON[eachTask].taskAttributes.logged_hours);
+		var _hours_dec = Number(incidentResponseJSON[eachTask].taskAttributes.hours) + Number(incidentResponseJSON[eachTask].taskAttributes.logged_hours);
+		var _hours = parseInt(_hours_dec, 10);
+		var _minutes_dec = _hours_dec - _hours;
+		var _minutes = parseInt((_minutes_dec * 60),10);
+		var _sec_dec = (_minutes_dec * 60) - _minutes;
+		var _sec =  parseInt((_sec_dec * 60),10);
 		var _state = incidentResponseJSON[eachTask].taskAttributes.state;
 		restMessage = new sn_ws.RESTMessageV2();
 		restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
-		restMessage.setEndpoint(restMessageDetails.getInstance() + 'incident/'+responseScrumTasks.result[result_counter].sys_id);
+		restMessage.setEndpoint(endpointBase + 'incident_task/'+responseIncidentTasks.result[result_counter].sys_id);
 		restMessage.setRequestHeader('Content-Type','application/json');
 		restMessage.setRequestHeader('Accept','application/json');
 		restMessage.setHttpMethod('PUT');
 		task = {
-			"actual_time_worked":_hours,
+			"time_worked":new GlideDuration(_hours+":"+_minutes+":"+_sec).getValue(),
 			"state":_state 
 		};
 		restMessage.setRequestBody(JSON.stringify(task));
 		var _responseCode = restMessage.execute();
-		var _response = JSON.parse(_responseCode.getBody());
-		response[eachTask] = {
-			status: _responseCode.getStatusCode(),
-			payload: {
-				number: _response.result.number,
-				short_description: _response.result.short_description,
-				state: _response.result.state,
-				hours: _response.result.actual_time_worked,
-				sys_id: _response.result.sys_id
-			},
-			sys_id: responseScrumTasks.result[result_counter].assigned_to.value
-		};
+		if(_responseCode && _responseCode.getBody()){
+			var _response = JSON.parse(_responseCode.getBody());
+			response[eachTask] = {
+				status: _responseCode.getStatusCode(),
+				payload: {
+					number: _response.result.number,
+					short_description: _response.result.short_description,
+					state: getChoices('incident_task',_response.result.state,''),
+					hours: Number(new GlideDateTime(_response.result.time_worked).getNumericValue()/(1000*3600)),
+					sys_id: _response.result.sys_id
+				},
+				sys_id: responseIncidentTasks.result[result_counter].assigned_to.value
+			};
+		}
 		result_counter++;
+	}
 	}
 	return response;
 }]]></script>
@@ -64,14 +75,14 @@
         <sys_created_on>2017-09-11 11:07:32</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>182e21474f414300afef74828110c7d6</sys_id>
-        <sys_mod_count>3</sys_mod_count>
+        <sys_mod_count>18</sys_mod_count>
         <sys_name>updateIncidentsViaRest</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy>read</sys_policy>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_include_182e21474f414300afef74828110c7d6</sys_update_name>
-        <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-10-04 12:29:46</sys_updated_on>
+        <sys_updated_by>souvik.ghosh</sys_updated_by>
+        <sys_updated_on>2017-10-26 18:20:40</sys_updated_on>
     </sys_script_include>
 </record_update>

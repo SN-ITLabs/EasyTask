@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_snc_easytask.UpdateTasksViaRest</api_name>
+        <client_callable>false</client_callable>
+        <description>Update Tasks via PUT/POST using Table Api</description>
+        <name>UpdateTasksViaRest</name>
+        <script><![CDATA[var UpdateTasksViaRest = Class.create();
+UpdateTasksViaRest.prototype = {
+
+	endpointBase : 'https://' + gs.getProperty('x_snc_easytask.surf_instance_name') + '.service-now.com/api/now/table/',
+	username: gs.getProperty('x_snc_easytask.surf_user_name'),
+	password: gs.getProperty('x_snc_easytask.surf_user_pwd'),
+	log: gs.getProperty('x_snc_easytask.enablelog'),
+	
+    initialize: function() {
+    },
+	
+	_getTasksToUpdate: function(objKeys,table_name) {
+		
+		var queryParamString = 'number\=',tasks = {};
+		
+		for(var i=0; i<objKeys.length-1; i++){
+			queryParamString += objKeys[i] + '\^ORnumber\='; 
+		}
+		queryParamString += objKeys[objKeys.length-1];
+		
+		var restParam = {
+			type: 'GET',
+			url: this.endpointBase + table_name,
+			sysparm_query: queryParamString+'^ORDERBYnumber',
+			sysparm_fields: 'number,sys_id'	
+		};
+		
+		tasks = this.executeGET(restParam);
+		
+		return tasks ;
+	},
+	
+	_setTime_Worked: function(_hours_dec){
+		
+		var _hours = parseInt(_hours_dec, 10);
+		var _minutes_dec = _hours_dec - _hours;
+		var _minutes = parseInt((_minutes_dec * 60),10);
+		var _sec_dec = (_minutes_dec * 60) - _minutes;
+		var _sec =  parseInt((_sec_dec * 60),10);
+		
+		return new GlideDuration(_hours+":"+_minutes+":"+_sec).getValue();
+		
+	},
+	
+	updateTasksViaRest: function(parsedJSON,table){
+		
+		var response = {};
+		var objKeys = Object.keys(parsedJSON);
+		var tasks = this._getTasksToUpdate(objKeys,table);
+		
+		if(tasks == '')
+			return;
+		
+		var result_counter = 0;
+		
+		for (var eachTask in parsedJSON){
+			var task = {};
+			var _state = parsedJSON[eachTask].taskAttributes.state;
+			var _hours_dec = Number(parsedJSON[eachTask].taskAttributes.hours) + Number(parsedJSON[eachTask].taskAttributes.logged_hours);
+			if(table != 'rm_scrum_task'){
+				var time_worked = this._setTime_Worked(_hours_dec);
+				task = {
+					"time_worked":time_worked,
+					"state":_state 
+				};
+			}
+			
+			else 
+				task = {
+					"hours":_hours_dec,
+					"state":_state 
+				};
+			
+			if(this.log)
+				gs.info('TaskToUpdate: '+JSON.stringify(task)+' '+table+' '+tasks.result[result_counter].number);
+			
+			
+			var restParam = {
+				type: 'PUT',
+				url: this.endpointBase + table + '/' + tasks.result[result_counter].sys_id,
+				requestBody: JSON.stringify(task)
+			};
+			
+			result_counter++;
+			
+			var _response = this._executePOST(restParam);
+			
+			if(_response == '')
+				continue;
+			
+			response[eachTask] = this._returnResponse(_response,table);
+		}
+		return response;
+		
+	},
+	
+	_executePOST: function(restParams){
+		
+		var restMessage = new sn_ws.RESTMessageV2(),result = '';
+	
+		try{
+			restMessage.setHttpMethod(restParams.type);
+			restMessage.setBasicAuth(this.username,this.password);
+			restMessage.setEndpoint(restParams.url);
+			restMessage.setRequestHeader('Content-Type','application/json');
+			restMessage.setRequestHeader('Accept','application/json');
+			restMessage.setRequestBody(restParams.requestBody);
+			result = restMessage.execute();
+		
+			if(result && result.getBody())
+				result = JSON.parse(result.getBody());
+		}
+		catch(err){
+			gs.error('Error executing Rest Call to URI: '+restParams.url+'with request body: '+restParams.requestBody + ' '+err.toString());
+			result = '';
+		}
+		
+		return result;
+		
+	},
+	
+	_returnResponse: function(_response,table){
+		var _response_ = {};
+		switch (table){
+			case 'rm_scrum_task' : 
+				_response_ = {
+					payload: {
+						number: _response.result.number,
+						story: _response.result.story.link,
+						type: _response.result.type,
+						short_description: _response.result.short_description,
+						state: getChoices(table,_response.result.state,''),
+						planned_hours: _response.result.planned_hours,
+						hours: _response.result.hours,
+						sys_id: _response.result.sys_id
+					}
+				};
+				break;
+				
+			case 'rm_defect' :
+				_response_ = {
+					payload: {
+						number: _response.result.number,
+						type: _response.result.type,
+						short_description: _response.result.short_description,
+						state: getChoices(table,_response.result.state,''),
+						hours: Number(new GlideDateTime(_response.result.time_worked).getNumericValue()/(1000*3600)),
+						sys_id: _response.result.sys_id
+					}
+				};
+				break;
+				
+			case 'incident_task' :
+				_response_ = {
+					payload: {
+						number: _response.result.number,
+						short_description: _response.result.short_description,
+						state: getChoices(table,_response.result.state,''),
+						hours: Number(new GlideDateTime(_response.result.time_worked).getNumericValue()/(1000*3600)),
+						sys_id: _response.result.sys_id
+					}
+				};
+				break;
+				
+			case 'sc_task' :
+				_response_ = {
+					payload: {
+						number: _response.result.number,
+						short_description: _response.result.short_description,
+						state: getChoices(table,_response.result.state,''),
+						hours: Number(new GlideDateTime(_response.result.time_worked).getNumericValue()/(1000*3600)),
+						sys_id: _response.result.sys_id
+					}
+				};
+				break;
+			default :
+		}
+		return _response_;
+	},
+	
+	executeGET: function(restParams){
+	
+		var restMessage = new sn_ws.RESTMessageV2(),result = '';
+	
+		try{
+			restMessage.setHttpMethod(restParams.type);
+			restMessage.setBasicAuth(this.username,this.password);
+			restMessage.setEndpoint(restParams.url);
+	
+			if(restParams.hasOwnProperty('sysparm_query') && restParams.sysparm_query != '')
+				restMessage.setQueryParameter('sysparm_query',restParams.sysparm_query);
+	
+			if(restParams.hasOwnProperty('sysparm_fields') && restParams.sysparm_fields != '')
+				restMessage.setQueryParameter('sysparm_fields',restParams.sysparm_fields);
+		
+			result = restMessage.execute();
+		
+			if(result && result.getBody())
+				result = JSON.parse(result.getBody());
+		}
+		catch(err){
+			gs.error('Error executing Rest Call to URI: '+restParams.url+'with query: '+restParams.sysparm_query + ' '+err.toString());
+			result = '';
+		}
+	
+		return result;
+	
+	},
+
+    type: 'UpdateTasksViaRest'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>souvik.ghosh</sys_created_by>
+        <sys_created_on>2017-11-09 08:58:45</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>5818c5ca13568300b1123192e144b02e</sys_id>
+        <sys_mod_count>22</sys_mod_count>
+        <sys_name>UpdateTasksViaRest</sys_name>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_script_include_5818c5ca13568300b1123192e144b02e</sys_update_name>
+        <sys_updated_by>souvik.g</sys_updated_by>
+        <sys_updated_on>2017-11-22 10:03:46</sys_updated_on>
+    </sys_script_include>
+</record_update>

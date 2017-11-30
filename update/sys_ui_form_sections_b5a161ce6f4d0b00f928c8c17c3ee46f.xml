@@ -21,7 +21,7 @@
             <sys_class_name>sys_ui_form</sys_class_name>
             <sys_created_by>souvik</sys_created_by>
             <sys_created_on>2017-09-08 07:31:07</sys_created_on>
-            <sys_customer_update>true</sys_customer_update>
+            <sys_customer_update>false</sys_customer_update>
             <sys_domain>global</sys_domain>
             <sys_domain_path>/</sys_domain_path>
             <sys_id>b5a161ce6f4d0b00f928c8c17c3ee46f</sys_id>

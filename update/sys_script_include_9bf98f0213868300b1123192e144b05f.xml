@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_snc_easytask.RESTMessageExec</api_name>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>RESTMessageExec</name>
+        <script><![CDATA[function RESTMessageExec(restParams){
+	
+	var restMessage = new sn_ws.RESTMessageV2(),result;
+	
+	try{
+		restMessage.setHttpMethod(restParams.type);
+	
+		restMessage.setBasicAuth(gs.getProperty('x_snc_easytask.surf_user_name'),gs.getProperty('x_snc_easytask.surf_user_pwd'));
+	
+		restMessage.setEndpoint(restParams.url);
+	
+		if(restParams.hasOwnProperty('sysparm_query') && restParams.sysparm_query != '')
+			restMessage.setQueryParameter('sysparm_query',restParams.sysparm_query);
+	
+		if(restParams.hasOwnProperty('sysparm_fields') && restParams.sysparm_fields != '')
+			restMessage.setQueryParameter('sysparm_fields',restParams.sysparm_fields);
+		
+		result = restMessage.execute();
+		
+		if(result && result.getBody())
+			result = JSON.parse(result.getBody());
+	}
+	catch(err){
+		gs.error('Error executing Rest Call to URI: '+restParams.url+'with query: '+restParams.sysparm_query + ' '+err.toString());
+		result = '';
+	}
+	
+	return result;
+	
+}]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>souvik.ghosh</sys_created_by>
+        <sys_created_on>2017-10-28 10:56:55</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>9bf98f0213868300b1123192e144b05f</sys_id>
+        <sys_mod_count>10</sys_mod_count>
+        <sys_name>RESTMessageExec</sys_name>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_script_include_9bf98f0213868300b1123192e144b05f</sys_update_name>
+        <sys_updated_by>souvik.ghosh</sys_updated_by>
+        <sys_updated_on>2017-11-07 05:08:44</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_snc_easytask.RestMessageUtil</api_name>
+        <client_callable>false</client_callable>
+        <description>Rest Message to get and post Data</description>
+        <name>RestMessageUtil</name>
+        <script><![CDATA[var RestMessageUtil = Class.create();
+RestMessageUtil.prototype = {
+	
+	username: gs.getProperty('x_snc_easytask.surf_user_name'),
+	password: gs.getProperty('x_snc_easytask.surf_user_pwd'),
+	log: gs.getProperty('x_snc_easytask.enablelog'),
+	
+    initialize: function() {
+    },
+	
+	executeGET: function(restParams){
+	
+		var restMessage = new sn_ws.RESTMessageV2(),result = '';
+	
+		try{
+			restMessage.setHttpMethod(restParams.type);
+			restMessage.setBasicAuth(this.username,this.password);
+			restMessage.setEndpoint(restParams.url);
+	
+			if(restParams.hasOwnProperty('sysparm_query') && restParams.sysparm_query != '')
+				restMessage.setQueryParameter('sysparm_query',restParams.sysparm_query);
+	
+			if(restParams.hasOwnProperty('sysparm_fields') && restParams.sysparm_fields != '')
+				restMessage.setQueryParameter('sysparm_fields',restParams.sysparm_fields);
+		
+			result = restMessage.execute();
+		
+			if(result && result.getBody())
+				result = JSON.parse(result.getBody());
+		}
+		catch(err){
+			gs.error('Error executing Rest Call to URI: '+restParams.url+'with query: '+restParams.sysparm_query + ' '+err.toString());
+			result = '';
+		}
+	
+		return result;
+	
+	},
+	
+	_executePOST: function(restParams){
+		
+		var restMessage = new sn_ws.RESTMessageV2(),result = '';
+	
+		try{
+			restMessage.setHttpMethod(restParams.type);
+			restMessage.setBasicAuth(this.username,this.password);
+			restMessage.setEndpoint(restParams.url);
+			restMessage.setRequestHeader('Content-Type','application/json');
+			restMessage.setRequestHeader('Accept','application/json');
+			restMessage.setRequestBody(restParams.requestBody);
+			result = restMessage.execute();
+		
+			if(result && result.getBody())
+				result = JSON.parse(result.getBody());
+		}
+		catch(err){
+			gs.error('Error executing Rest Call to URI: '+restParams.url+'with request body: '+restParams.requestBody + ' '+err.toString());
+			result = '';
+		}
+	},
+
+    type: 'RestMessageUtil'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>souvik.ghosh</sys_created_by>
+        <sys_created_on>2017-11-12 16:22:20</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>c12a4a0713560700b1123192e144b089</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>RestMessageUtil</sys_name>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_script_include_c12a4a0713560700b1123192e144b089</sys_update_name>
+        <sys_updated_by>souvik.ghosh</sys_updated_by>
+        <sys_updated_on>2017-11-14 06:19:15</sys_updated_on>
+    </sys_script_include>
+</record_update>

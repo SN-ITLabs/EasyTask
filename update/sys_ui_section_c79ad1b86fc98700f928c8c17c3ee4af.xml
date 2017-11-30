@@ -183,6 +183,34 @@
             <sys_user/>
             <type/>
         </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>u_timeworked</element>
+            <position>13</position>
+            <sys_created_by>souvik.ghosh</sys_created_by>
+            <sys_created_on>2017-11-14 09:58:16</sys_created_on>
+            <sys_id>5ed587eb13564700b1123192e144b0b1</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_snc_easytask_mailresponsepayload" sys_domain="global" view="Default view">c79ad1b86fc98700f928c8c17c3ee4af</sys_ui_section>
+            <sys_updated_by>souvik.ghosh</sys_updated_by>
+            <sys_updated_on>2017-11-14 09:58:16</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>u_prevtimeworked</element>
+            <position>14</position>
+            <sys_created_by>souvik.ghosh</sys_created_by>
+            <sys_created_on>2017-11-14 09:59:30</sys_created_on>
+            <sys_id>68268beb13564700b1123192e144b018</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_snc_easytask_mailresponsepayload" sys_domain="global" view="Default view">c79ad1b86fc98700f928c8c17c3ee4af</sys_ui_section>
+            <sys_updated_by>souvik.ghosh</sys_updated_by>
+            <sys_updated_on>2017-11-14 09:59:30</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
         <sys_ui_section action="INSERT_OR_UPDATE">
             <caption/>
             <header>false</header>
@@ -191,11 +219,11 @@
             <sys_class_name>sys_ui_section</sys_class_name>
             <sys_created_by>souvik</sys_created_by>
             <sys_created_on>2017-09-04 09:41:49</sys_created_on>
-            <sys_customer_update>true</sys_customer_update>
+            <sys_customer_update>false</sys_customer_update>
             <sys_domain>global</sys_domain>
             <sys_domain_path>/</sys_domain_path>
             <sys_id>c79ad1b86fc98700f928c8c17c3ee4af</sys_id>
-            <sys_mod_count>0</sys_mod_count>
+            <sys_mod_count>2</sys_mod_count>
             <sys_name>x_snc_easytask_mailresponsepayload</sys_name>
             <sys_overrides/>
             <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
@@ -203,8 +231,8 @@
             <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
             <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
             <sys_update_name>sys_ui_section_c79ad1b86fc98700f928c8c17c3ee4af</sys_update_name>
-            <sys_updated_by>souvik</sys_updated_by>
-            <sys_updated_on>2017-09-04 09:41:49</sys_updated_on>
+            <sys_updated_by>souvik.ghosh</sys_updated_by>
+            <sys_updated_on>2017-11-14 09:59:30</sys_updated_on>
             <sys_user/>
             <title>true</title>
             <view display_value="Default view" name="NULL">Default view</view>

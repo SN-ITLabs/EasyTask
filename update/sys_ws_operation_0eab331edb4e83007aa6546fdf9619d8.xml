@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ws_operation">
+    <sys_ws_operation action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <consumes>application/json,application/xml,text/xml</consumes>
+        <consumes_customized>false</consumes_customized>
+        <default_operation_uri/>
+        <enforce_acl/>
+        <http_method>POST</http_method>
+        <name>process</name>
+        <operation_script><![CDATA[(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
+
+	/* Example input
+	{"update_id":111122443,
+	 "message":{"message_id":4,
+			 "from": {"id":450594242,"is_bot":false,"first_name":"Chaitanya","last_name":"Saragadam","language_code":"en-US"},
+			 "chat":{"id":450594242,"first_name":"Chaitanya","last_name":"Saragadam","type":"private"},
+			 "date":1509259557,"text":"hellow"}}
+	*/
+	gs.info("***Chaitu = ");
+	var chatId, requestCommand, responseText;
+	var responseHandler = new x_snc_bots.CommandControlCenter();
+	var callBackServer = "https://api.telegram.org/bot";
+	var botToken = gs.getProperty("x_snc_easytask.etask_bot_token");
+	var responseURI = "/sendmessage?chat_id=${chat_id}&text=${responseText}";
+    var requestBody = request.body;	
+	var requestString = requestBody.dataString;
+	gs.info('requestString = ' + requestString);
+	if(requestString) {
+		var reqObj = global.JSON.parse(requestString);
+		if(reqObj && reqObj["message"] && reqObj["message"]["chat"]  && reqObj["message"]["chat"]["id"]) {
+			chatId = reqObj["message"]["chat"]["id"];
+			requestCommand = reqObj["message"]["text"];
+			responseText = responseHandler.getResponse(requestCommand);
+			responseURI = responseURI.replace('${chat_id}', chatId).replace('${responseText}', encodeURIComponent(responseText));
+			gs.info('requestString = ' + requestString);
+		}
+	}
+	
+	if(responseText) {
+		callBackServer = callBackServer + botToken + responseURI;
+		var respBody = executeCallback(callBackServer);		
+		gs.info("Webhook response = " + respBody);
+	}
+	
+	
+	
+	function executeCallback(url) {
+		var request = new sn_ws.RESTMessageV2();
+		request.setHttpMethod('get');
+		request.setEndpoint(url);		
+		var response = request.execute();
+		var responseBody = JSON.parse(response.getBody());
+		return responseBody;
+	}
+})(request, response);]]></operation_script>
+        <operation_uri>/api/x_snc_easytask/etaskbot/process</operation_uri>
+        <produces>application/json,application/xml,text/xml</produces>
+        <produces_customized>false</produces_customized>
+        <relative_path>/process</relative_path>
+        <request_example/>
+        <requires_acl_authorization>false</requires_acl_authorization>
+        <requires_authentication>false</requires_authentication>
+        <short_description/>
+        <sys_class_name>sys_ws_operation</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-10-29 06:27:27</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>0eab331edb4e83007aa6546fdf9619d8</sys_id>
+        <sys_mod_count>20</sys_mod_count>
+        <sys_name>process</sys_name>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_ws_operation_0eab331edb4e83007aa6546fdf9619d8</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-10-30 06:33:37</sys_updated_on>
+        <web_service_definition display_value="etaskbot">438bbfdadb4e83007aa6546fdf96198d</web_service_definition>
+        <web_service_version/>
+    </sys_ws_operation>
+</record_update>

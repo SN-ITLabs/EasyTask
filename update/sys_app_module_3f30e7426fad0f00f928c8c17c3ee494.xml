@@ -29,18 +29,18 @@
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>3f30e7426fad0f00f928c8c17c3ee494</sys_id>
-        <sys_mod_count>0</sys_mod_count>
-        <sys_name>ChoiceLists</sys_name>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>Remote Instance State Choices</sys_name>
         <sys_overrides/>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_app_module_3f30e7426fad0f00f928c8c17c3ee494</sys_update_name>
-        <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-10-03 13:15:38</sys_updated_on>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-10-25 11:04:24</sys_updated_on>
         <timeline_page/>
-        <title>ChoiceLists</title>
+        <title>Remote Instance State Choices</title>
         <uncancelable>false</uncancelable>
         <view_name/>
         <window_name/>

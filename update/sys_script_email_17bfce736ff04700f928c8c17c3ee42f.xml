@@ -11,7 +11,7 @@
 	
 	var response = JSON.parse(event.parm2);
 	email.setSubject('Task Updation Status');
-	var endpointBase = 'https://' + gs.getProperty('x_snc_easytask.surf_instance_name') + '.service-now.com/api/now/table/';
+	var endpointBase = gs.getProperty('x_snc_easytask.surf_instance_name');
 	var restMessage = new sn_ws.RESTMessageV2();
 	var restMessageDetails = new RESTMessageSetup();
 	restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
@@ -24,31 +24,33 @@
 	gs.info("Manager: "+managerEmail);
 	email.addAddress('cc',managerEmail);*/
 	template.print('<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable"><tr><td align="left" valign="top"><table cellpadding="0" cellspacing="0" width="700px">');
-	var count = 0,countDefect = 0,countIncident = 0;
+	var count = 0,countDefect = 0,countIncident = 0,countCatalog=0;
 	var border = 'border: 1px solid #0368d4;';
 	var webKitBorder = '-webkit-border-radius: 3px;';
 	var mozBorder = '-moz-border-radius: 3px;';
 	var padding = 'padding: 5px;';
-	var max_width = 'max-width: 250px;'; 
+	var max_width = 'max-width: 250px;width: 33%;'; 
+	
 	var display = 'display:table-row;';
 		template.print('<p> The following tasks have been updated/created by you!!</p><tr style = "'+display+'">');
 	for(var _response in response.ScrumTasks){
 		var obj = response.ScrumTasks[_response];
 		for (var key in obj){
 			restMessage.setEndpoint(obj[key].payload.story);
-			var story = JSON.parse(restMessage.execute().getBody()).result.short_description.substring(0,14);
+			var story = JSON.parse(restMessage.execute().getBody()).result.short_description.substring(0,34);
 			if(count > 2){
 				template.print('</tr><tr style = "'+display+'">');
 				count = 0;
 			}
-			template.print('<td style="'+border+webKitBorder+padding+mozBorder+max_width+'"><p></p><p>&nbsp; Task: <a href=\"https://surfdev.service-now.com/nav_to.do?uri=rm_scrum_task.do?sys_id='+obj[key].payload.sys_id+'%26sysparm_view=Scrum\">'+obj[key].payload.number+'</a></p>');
-			template.print('<p>&nbsp; Story: '+story+'...</p>');
-			template.print('<p>&nbsp; Task type: '+obj[key].payload.type+'</p>');
-			template.print('<p>&nbsp; Short Description: '+obj[key].payload.short_description.substring(0,14)+'...</p>');
-			template.print('<p>&nbsp; State: '+obj[key].payload.state+'</p>');
-			template.print('<p>&nbsp; Planned Hours: '+obj[key].payload.planned_hours+'</p>');
-			template.print('<p>&nbsp; Actual Hours: '+obj[key].payload.hours+'</p><p></p></td>');
+			template.print('<td style="'+border+webKitBorder+padding+mozBorder+max_width+'"><p></p><p><a href=\"https://'+endpointBase+'.service-now.com/nav_to.do?uri=rm_scrum_task.do?sys_id='+obj[key].payload.sys_id+'%26sysparm_view=Scrum\">'+obj[key].payload.short_description.substring(0,34)+'</a></p>');
+			template.print('<p>'+story+'...</p>');
+			template.print('<p>State: '+obj[key].payload.state+'</p>');
+			template.print('<p>Planned Hours: '+obj[key].payload.planned_hours+'</p>');
+			template.print('<p>Actual Hours: '+obj[key].payload.hours+'</p><p></p></td>');
 			count++;
+		}
+		for(count ; count <= 2; count++){
+			template.print('<td style = "'+max_width+'"></td>');
 		}
 	}
 	template.print('</tr></table><br\>');
@@ -56,18 +58,17 @@
 	for(var _defect in response.Defects){
 		var _obj = response.Defects[_defect];
 		for (var _key in _obj){
-			restMessage.setEndpoint(_obj[_key].payload.story);
-			var _defectstory = JSON.parse(restMessage.execute().getBody()).result.short_description.substring(0,14);
 			if(countDefect > 2){
 				template.print('</tr><tr style = "'+display+'">');
 				countDefect = 0;
 			}
-			template.print('<td style="'+border+webKitBorder+padding+mozBorder+max_width+'"><p></p><p>&nbsp; Defect: <a href=\"https://surfdev.service-now.com/nav_to.do?uri=rm_defect.do?sys_id='+_obj[_key].payload.sys_id+'%26sysparm_view=Scrum\">'+_obj[_key].payload.number+'</a></p>');
-			template.print('<p>&nbsp; Story: '+_defectstory+'...</p>');
-			template.print('<p>&nbsp; Short Description: '+_obj[_key].payload.short_description.substring(0,14)+'...</p>');
-			template.print('<p>&nbsp; State: '+_obj[_key].payload.state+'</p>');
-			template.print('<p>&nbsp; Actual Hours: '+_obj[_key].payload.hours+'</p><p></p></td>');
+			template.print('<td style="'+border+webKitBorder+padding+mozBorder+max_width+'"><p></p><p>Defect:<a href=\"https://'+endpointBase+'.service-now.com/nav_to.do?uri=rm_defect.do?sys_id='+_obj[_key].payload.sys_id+'%26sysparm_view=Scrum\">'+_obj[_key].payload.short_description.substring(0,34)+'</a></p>');
+			template.print('<p>State: '+_obj[_key].payload.state+'</p>');
+			template.print('<p>Time_Worked: '+_obj[_key].payload.hours+'</p><p></p></td>');
 			countDefect++;
+		}
+		for(countDefect ; countDefect <= 2; countDefect++){
+			template.print('<td style = "'+max_width+'"></td>');
 		}
 	}
 	template.print('</tr></table><br\>');
@@ -79,11 +80,30 @@
 				template.print('</tr><tr style = "'+display+'">');
 				countIncident = 0;
 			}
-			template.print('<td style="'+border+webKitBorder+padding+mozBorder+max_width+'"><p></p><p>&nbsp; Incident: <a href=\"https://surfdev.service-now.com/nav_to.do?uri=incident.do?sys_id='+_incobj[_inckey].payload.sys_id+'%26sysparm_view=Scrum\">'+_incobj[_inckey].payload.number+'</a></p>');
-			template.print('<p>&nbsp; Short Description: '+_incobj[_inckey].payload.short_description.substring(0,14)+'...</p>');
-			template.print('<p>&nbsp; State: '+_incobj[_inckey].payload.state+'</p>');
-			template.print('<p>&nbsp; Actual Hours: '+_incobj[_inckey].payload.hours+'</p><p></p></td>');
+			template.print('<td style="'+border+webKitBorder+padding+mozBorder+max_width+'"><p></p><p><a href=\"https://'+endpointBase+'.service-now.com/nav_to.do?uri=incident_task.do?sys_id='+_incobj[_inckey].payload.sys_id+'%26sysparm_view=Scrum\">'+_incobj[_inckey].payload.short_description.substring(0,34)+'</a></p>');
+			template.print('<p>State: '+_incobj[_inckey].payload.state+'</p>');
+			template.print('<p>Time_Worked: '+_incobj[_inckey].payload.hours+'</p><p></p></td>');
 			countIncident++;
+		}
+		for(countIncident ; countIncident <= 2; countIncident++){
+			template.print('<td style = "'+max_width+'"></td>');
+		}
+	}
+	template.print('<table cellpadding="0" cellspacing="0" width="700px"><tr style = "'+display+'">');
+	for(var catalog in response.Catalog){
+		var _scobj = response.Catalog[catalog];
+		for (var _sckey in _scobj){
+			if(countIncident > 2){
+				template.print('</tr><tr style = "'+display+'">');
+				countCatalog = 0;
+			}
+			template.print('<td style="'+border+webKitBorder+padding+mozBorder+max_width+'"><p></p><p><a href=\"https://'+endpointBase+'.service-now.com/nav_to.do?uri=sc_task.do?sys_id='+_scobj[_sckey].payload.sys_id+'%26sysparm_view=Scrum\">'+_scobj[_sckey].payload.short_description.substring(0,34)+'</a></p>');
+			template.print('<p>State: '+_scobj[_sckey].payload.state+'</p>');
+			template.print('<p>Time_Worked: '+_scobj[_sckey].payload.hours+'</p><p></p></td>');
+			countCatalog++;
+		}
+		for(countCatalog ; countCatalog <= 2; countCatalog++){
+			template.print('<td style = "'+max_width+'"></td>');
 		}
 	}
 	template.print('</tr></table></td></tr></table>');
@@ -93,14 +113,14 @@
         <sys_created_on>2017-09-01 11:50:18</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>17bfce736ff04700f928c8c17c3ee42f</sys_id>
-        <sys_mod_count>48</sys_mod_count>
+        <sys_mod_count>59</sys_mod_count>
         <sys_name>formEmailWithResponse</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_email_17bfce736ff04700f928c8c17c3ee42f</sys_update_name>
-        <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-10-25 10:24:54</sys_updated_on>
+        <sys_updated_by>souvik.g</sys_updated_by>
+        <sys_updated_on>2017-11-22 10:01:54</sys_updated_on>
     </sys_script_email>
 </record_update>

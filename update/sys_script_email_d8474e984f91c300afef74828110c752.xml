@@ -9,44 +9,150 @@
 
           // Add your code here
 	var tasks = JSON.parse(event.parm2);
-	email.setSubject('Details of Task Updates');
-	template.print('<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable"><tr><td align="left" valign="top"><table cellpadding="0" cellspacing="0" width="700px"><p><strong>Progress report of tasks:</strong></p><br/>');
+	email.setSubject('Progress report of tasks');
+	email.addAddress("bcc", "souvik.ghosh@servicenow.com,pradeep.gouribhatla@servicenow.com");
+	template.print('<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable"><tr><td align="left" valign="top"><table cellpadding="0" cellspacing="2" width="700px"><br/>');
 	var border = 'border: 1px solid #0368d4;';
 	var webKitBorder = '-webkit-border-radius: 3px;';
 	var mozBorder = '-moz-border-radius: 3px;';
 	var width = 'width: 200px;';
 	var padding = 'padding: 5px;';
 	var count = 0;
+	var endpointBase = gs.getProperty('x_snc_easytask.surf_instance_name');
 	for(var _taskOwner in tasks){
 		var resultTasks = tasks[_taskOwner];
+		template.print('<table><p><strong>Hours logged by '+resultTasks.first_name+' yesterday: </strong>'+resultTasks.hours+'</p>');
 		if(resultTasks.hours != 0) {
-		var _firstName = _taskOwner.toString().split('.')[0];
-		_firstName = _firstName.replace(_firstName.charAt(0),_firstName.charAt(0).toUpperCase());
-		template.print('<table><p><strong>Hours logged by '+_firstName+' yesterday: </strong>'+resultTasks.hours+'</p>');
 		template.print('<tr>');
+		var dur_style = 'color: red;';
 		for(var i = 0; i < resultTasks.scrum_tasks.length; i++){
+			dur_style = 'color: red;';
 			if(count > 2){
 				template.print('</tr><tr>');
 				count = 0;
 			}
-			template.print('<td style="'+width+border+webKitBorder+padding+mozBorder+'"><p> '+resultTasks.scrum_tasks[i].short_description+'<\p>');
+			template.print('<td valign="top" style="'+width+border+webKitBorder+padding+mozBorder+'"><p><a href=\"https://'+endpointBase+'.service-now.com/nav_to.do?uri=rm_scrum_task.do?sys_id='+resultTasks.scrum_tasks[i].sys_id+'%26sysparm_view=Scrum\"><strong>Scrum Task</strong>: '+resultTasks.scrum_tasks[i].short_description+'</a><\p>');
 			template.print('<p> '+resultTasks.scrum_tasks[i].story+'</p>');
 			template.print('<p> State: '+resultTasks.scrum_tasks[i].oldState+' \-\> '+resultTasks.scrum_tasks[i].state+'</p>');
-			template.print('<p> Hours: '+resultTasks.scrum_tasks[i].oldHours+' \-\> '+resultTasks.scrum_tasks[i].hours+'</p></td>');
+			template.print('<p> Hours: '+resultTasks.scrum_tasks[i].oldHours+' \-\> '+resultTasks.scrum_tasks[i].hours+'</p>');
+			
+			
+			if(resultTasks.scrum_tasks[i].due_date && resultTasks.scrum_tasks[i].due_date != '') {
+				var gdt1 = new GlideDateTime();
+				var gdt2 = new GlideDateTime(resultTasks.scrum_tasks[i].due_date);
+
+				var dur = gdt2.getNumericValue() - gdt1.getNumericValue(); //the difference between gdt2 and gdt1
+				
+				
+				if(dur > 0)
+					dur_style = 'color: green;';
+				else if(dur == 0)
+					dur_style = 'color: yellow;';
+					
+				template.print('<p> Due Date: <span style="'+dur_style+'">'+gdt2.getDate()+'</span></p>');
+					
+			
+			}
+			else{
+				template.print('<p><span style="'+dur_style+'">No due date specified</span></p></td>');
+			}
+			
 			count++;
 		}
-		for(var j = 0; j < resultTasks.defects.length; i++){
+		for(var j = 0; j < resultTasks.defects.length; j++){
+			dur_style = 'color: red;';
 			if(count > 2){
 				template.print('</tr><tr>');
 				count = 0;
 			}
-			template.print('<td style="'+width+border+webKitBorder+padding+mozBorder+'"><p> '+resultTasks.defects[j].short_description+'<\p>');
+			template.print('<td valign="top" style="'+width+border+webKitBorder+padding+mozBorder+'"><p><a href=\"https://'+endpointBase+'.service-now.com/nav_to.do?uri=rm_defect.do?sys_id='+resultTasks.defects[j].sys_id+'%26sysparm_view=Scrum\"><strong>Defect</strong>: '+resultTasks.defects[j].short_description+'</a><\p>');
 			//template.print('<p> '+resultTasks[i].story+'</p>');
 			template.print('<p> State: '+resultTasks.defects[j].oldState+' \-\> '+resultTasks.defects[j].state+'</p>');
-			template.print('<p> Hours: '+resultTasks.defects[j].oldHours+' \-\> '+resultTasks.defects[j].hours+'</p></td>');
+			template.print('<p> Efforts Logged: '+resultTasks.defects[j].oldHours+' \-\> '+resultTasks.defects[j].hours+'</p>');
+			
+			if(resultTasks.defects[j].due_date && resultTasks.defects[j].due_date != '') {
+				var _gdt1 = new GlideDateTime();
+				var _gdt2 = new GlideDateTime(resultTasks.defects[j].due_date);
+
+				var _dur = _gdt2.getNumericValue() - _gdt1.getNumericValue(); //the difference between gdt2 and gdt1
+				
+				if(_dur > 0)
+					dur_style = 'color: green;';
+				else if(_dur == 0)
+					dur_style = 'color: yellow;';
+					
+				template.print('<p> Due Date: <span style="'+dur_style+'">'+_gdt2.getDate()+'</span></p>');
+			
+			}
+			else{
+				template.print('<p><span style="'+dur_style+'">No due date specified</span></p></td>');
+			}
 			count++;
 		}
 		count = 0;
+		
+		for(var k = 0; k < resultTasks.incidents.length; k++){
+			dur_style = 'color: red;';
+			if(count > 2){
+				template.print('</tr><tr>');
+				count = 0;
+			}
+			template.print('<td valign="top" style="'+width+border+webKitBorder+padding+mozBorder+'"><p><a href=\"https://'+endpointBase+'.service-now.com/nav_to.do?uri=incident_task.do?sys_id='+resultTasks.incidents[k].sys_id+'%26sysparm_view=Scrum\"><strong>Incident</strong>: '+resultTasks.incidents[k].short_description+'</a><\p>');
+			template.print('<p> State: '+resultTasks.incidents[k].oldState+' \-\> '+resultTasks.incidents[k].state+'</p>');
+			template.print('<p> Efforts Logged: '+resultTasks.incidents[k].oldHours+' \-\> '+resultTasks.incidents[k].hours+'</p>');
+			
+			
+			if(resultTasks.incidents[k].due_date && resultTasks.incidents[k].due_date != '') {
+				var gdt1_ = new GlideDateTime();
+				var gdt2_ = new GlideDateTime(resultTasks.incidents[k].due_date);
+
+				var dur_ = gdt2_.getNumericValue() - gdt1_.getNumericValue(); //the difference between gdt2 and gdt1
+				
+				if(dur_ > 0)
+					dur_style = 'color: green;';
+				else if(dur_ == 0)
+					dur_style = 'color: yellow;';
+					
+				template.print('<p> Due Date: <span style="'+dur_style+'">'+gdt2_.getDate()+'</span></p>');
+					
+			}
+			else{
+				template.print('<p><span style="'+dur_style+'">No due date specified</span></p></td>');
+			}
+			count++;
+		}
+		count = 0;	
+		
+		for(var l = 0; l < resultTasks.sc.length; l++){
+			dur_style = 'color: red;';
+			if(count > 2){
+				template.print('</tr><tr>');
+				count = 0;
+			}
+			template.print('<td valign="top" style="'+width+border+webKitBorder+padding+mozBorder+'"><p><a href=\"https://'+endpointBase+'.service-now.com/nav_to.do?uri=incident_task.do?sys_id='+resultTasks.sc[l].sys_id+'%26sysparm_view=Scrum\"><strong>Request</strong>: '+resultTasks.sc[l].short_description+'</a><\p>');
+			template.print('<p> State: '+resultTasks.sc[l].oldState+' \-\> '+resultTasks.sc[l].state+'</p>');
+			template.print('<p> Efforts Logged: '+resultTasks.sc[l].oldHours+' \-\> '+resultTasks.sc[l].hours+'</p>');
+			
+			if(resultTasks.sc[l].due_date && resultTasks.sc[l].due_date != '') {
+				var _gdt1_ = new GlideDateTime();
+				var _gdt2_ = new GlideDateTime(resultTasks.sc[l].due_date);
+
+				var _dur_ = _gdt2_.getNumericValue() - _gdt1_.getNumericValue(); //the difference between gdt2 and gdt1
+				
+				if(_dur_ > 0)
+					dur_style = 'color: green;';
+				else if(_dur_ == 0)
+					dur_style = 'color: yellow;';
+					
+				template.print('<p> Due Date: <span style="'+dur_style+'">'+_gdt2_.getDate()+'</span></p>');
+					
+			}
+			else{
+				template.print('<p><span style="'+dur_style+'">No due date specified</span></p></td>');
+			}
+			count++;
+		}
+		count = 0;		
 		}
 		template.print('</tr></table>');
 	}
@@ -57,14 +163,14 @@
         <sys_created_on>2017-09-15 10:22:54</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>d8474e984f91c300afef74828110c752</sys_id>
-        <sys_mod_count>31</sys_mod_count>
+        <sys_mod_count>65</sys_mod_count>
         <sys_name>tasksReport</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_email_d8474e984f91c300afef74828110c752</sys_update_name>
-        <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-10-11 17:42:13</sys_updated_on>
+        <sys_updated_by>souvik.g</sys_updated_by>
+        <sys_updated_on>2017-11-29 13:26:34</sys_updated_on>
     </sys_script_email>
 </record_update>

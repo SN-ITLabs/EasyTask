@@ -12,7 +12,7 @@
             <sys_class_name>sys_documentation</sys_class_name>
             <sys_created_by>souvik</sys_created_by>
             <sys_created_on>2017-09-08 07:30:15</sys_created_on>
-            <sys_customer_update>true</sys_customer_update>
+            <sys_customer_update>false</sys_customer_update>
             <sys_id>cd71ed8e6f4d0b00f928c8c17c3ee433</sys_id>
             <sys_mod_count>0</sys_mod_count>
             <sys_name>Previous state</sys_name>

@@ -13,7 +13,6 @@
 		gr.addQuery('u_task_id','=',response[_response].payload.number.toString());
 		gr.query();
 		if(gr.next()){
-			gr.u_usersys_id = response[_response].sys_id;
 			gr.u_hours = response[_response].payload.hours;
 			gr.update();
 		}
@@ -31,14 +30,14 @@
         <sys_created_on>2017-09-04 14:15:05</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>61671eb46f4d8700f928c8c17c3ee438</sys_id>
-        <sys_mod_count>13</sys_mod_count>
+        <sys_mod_count>14</sys_mod_count>
         <sys_name>updatePayloadTable</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy>read</sys_policy>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_include_61671eb46f4d8700f928c8c17c3ee438</sys_update_name>
-        <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-10-23 16:57:16</sys_updated_on>
+        <sys_updated_by>souvik.ghosh</sys_updated_by>
+        <sys_updated_on>2017-10-27 13:01:30</sys_updated_on>
     </sys_script_include>
 </record_update>

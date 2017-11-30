@@ -2,7 +2,7 @@
 <record_update sys_domain="global" table="sys_ui_module">
     <sys_ui_module action="INSERT_OR_UPDATE">
         <active>true</active>
-        <application display_value="SubscribedForEmailNotifications">0b5ca6c66f2d0f00f928c8c17c3ee4e0</application>
+        <application display_value="Subscribed for emails">0b5ca6c66f2d0f00f928c8c17c3ee4e0</application>
         <filter/>
         <name>SubscribedForEmailNotifications</name>
         <order/>
@@ -12,7 +12,7 @@
         <sys_class_name>sys_ui_module</sys_class_name>
         <sys_created_by>souvik</sys_created_by>
         <sys_created_on>2017-10-03 09:28:56</sys_created_on>
-        <sys_customer_update>true</sys_customer_update>
+        <sys_customer_update>false</sys_customer_update>
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>4b5ca6c66f2d0f00f928c8c17c3ee4e2</sys_id>

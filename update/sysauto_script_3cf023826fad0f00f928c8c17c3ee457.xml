@@ -4,21 +4,22 @@
         <active>true</active>
         <condition/>
         <conditional>false</conditional>
-        <name>SyncStateChoiceLists</name>
+        <name>Sync state choice lists</name>
         <run_as display_value="">ca6be16e4f340700afef74828110c702</run_as>
         <run_as_tz/>
         <run_dayofmonth>1</run_dayofmonth>
         <run_dayofweek>7</run_dayofweek>
         <run_period/>
         <run_start>2017-10-03 13:18:41</run_start>
-        <run_time>1970-01-01 19:29:00</run_time>
-        <run_type>weekly</run_type>
+        <run_time>1970-01-01 18:29:00</run_time>
+        <run_type>monthly</run_type>
         <script><![CDATA[var syncChoiceList = function(){
 	var restMessage = new sn_ws.RESTMessageV2();
 	var restMessageDetails = new RESTMessageSetup();
+	var endpointBase = 'https://' + gs.getProperty('x_snc_easytask.surf_instance_name') + '.service-now.com/api/now/table/';
 	restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
 	restMessage.setHttpMethod('get');
-	restMessage.setEndpoint(restMessageDetails.getInstance() + 'sys_choice');
+	restMessage.setEndpoint(endpointBase + 'sys_choice');
 	restMessage.setQueryParameter('sysparm_query','nameINrm_scrum_task,rm_defect,incident_task^element=state');
 	restMessage.setQueryParameter('sysparm_fields','name,value,label');
 	var parsed = JSON.parse(restMessage.execute().getBody());
@@ -32,15 +33,15 @@ syncChoiceList();]]></script>
         <sys_created_on>2017-10-03 13:23:30</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>3cf023826fad0f00f928c8c17c3ee457</sys_id>
-        <sys_mod_count>24</sys_mod_count>
-        <sys_name>SyncStateChoiceLists</sys_name>
+        <sys_mod_count>29</sys_mod_count>
+        <sys_name>Sync state choice lists</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sysauto_script_3cf023826fad0f00f928c8c17c3ee457</sys_update_name>
-        <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-10-04 12:32:53</sys_updated_on>
+        <sys_updated_by>souvik.ghosh</sys_updated_by>
+        <sys_updated_on>2017-11-09 13:34:06</sys_updated_on>
         <upgrade_safe>false</upgrade_safe>
     </sysauto_script>
 </record_update>

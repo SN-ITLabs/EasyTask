@@ -4,7 +4,7 @@
         <sys_class_name>sys_security_acl_role</sys_class_name>
         <sys_created_by>souvik</sys_created_by>
         <sys_created_on>2017-09-04 09:26:00</sys_created_on>
-        <sys_customer_update>true</sys_customer_update>
+        <sys_customer_update>false</sys_customer_update>
         <sys_id>a595d9f46fc98700f928c8c17c3ee410</sys_id>
         <sys_mod_count>0</sys_mod_count>
         <sys_name>x_snc_easytask_mailresponsepayload.x_snc_easytask.mailresponsepayload_user</sys_name>

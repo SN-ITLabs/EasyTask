@@ -4,88 +4,109 @@
         <active>true</active>
         <condition/>
         <conditional>false</conditional>
-        <name>Update Tasks Reminder</name>
+        <name>Update tasks reminder</name>
         <run_as display_value="">ca6be16e4f340700afef74828110c702</run_as>
         <run_as_tz/>
         <run_dayofmonth>1</run_dayofmonth>
         <run_dayofweek>1</run_dayofweek>
         <run_period/>
         <run_start>2017-08-28 12:20:59</run_start>
-        <run_time>1970-01-01 13:30:00</run_time>
+        <run_time>1970-01-01 12:30:00</run_time>
         <run_type>daily</run_type>
         <script><![CDATA[var scheduler = {};
 scheduler.getTasksByAssignedTo = function(){
-	var restMessageDetails = new RESTMessageSetup();
-	var restMessage = new sn_ws.RESTMessageV2();
+	
 	var endpointBase = 'https://' + gs.getProperty('x_snc_easytask.surf_instance_name') + '.service-now.com/api/now/table/';
-	restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
-	restMessage.setHttpMethod('get');
+	
 	var gr = new GlideRecord('x_snc_easytask_subscribedforemailnotifications');
 	gr.addQuery('u_active',true);
+	//gr.addQuery('u_devsysid','=','e5c41a35db7bb68403a4ff661d96199c');
+	//gr.addQuery('u_devsysid','=','ca30b82bdbfe9200427b750aaf9619d8');
 	gr.query();
-	var _task,_defect,_incident,result,_userTasks,_userDefects,_userIncidents;
+	
+	var _task,_defect,_incident,_sc,_userTasks,_userDefects,_userIncidents,_sc_task,restParam={};
+	
 	while(gr.next()){
-		restMessage.setEndpoint(endpointBase + 'rm_scrum_task');
-		restMessage.setQueryParameter('sysparm_query','active=true^assigned_to='+gr.u_devsysid+'^ORDERBYnumber');
-		result = restMessage.execute();
 		
-		if(result && result.getBody()) 
-			_userTasks = JSON.parse(result.getBody());
+		restParam = {
+			type: 'GET',
+			url: endpointBase + 'rm_scrum_task',
+			sysparm_query: 'active=true^ORDERBYnumber^assigned_to='+gr.u_devsysid,
+		};
+		var rstMsg = new RestMessageUtil();
+		_userTasks = rstMsg.executeGET(restParam);
 		
+		restParam = {
+			type: 'GET',
+			url: endpointBase + 'rm_defect',
+			sysparm_query: 'active=true^ORDERBYnumber^stateNOT IN2,6,9,11,12,17^u_developer_assigned_to='+gr.u_devsysid,
+		};
 		
-		/*restMessage = new sn_ws.RESTMessageV2();
-		restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
-		restMessage.setHttpMethod('get');
-		restMessage.setEndpoint(endpointBase + 'rm_defect');
-		restMessage.setQueryParameter('sysparm_query','active=true^assigned_to='+gr.u_devsysid+'^ORDERBYnumber');
-		result = restMessage.execute();
+		_userDefects = rstMsg.executeGET(restParam);
+	
+		restParam = {
+			type: 'GET',
+			url: endpointBase + 'incident_task',
+			sysparm_query: 'active=true^ORDERBYnumber^state!=3^assigned_to='+gr.u_devsysid,
+		};
 		
-		if(result && result.getBody()) 
-			_userDefects = JSON.parse(result.getBody());
+		_userIncidents = rstMsg.executeGET(restParam);
 		
+		restParam = {
+			type: 'GET',
+			url: endpointBase + 'sc_task',
+			sysparm_query: 'active=true^ORDERBYnumber^stateNOT IN3,4,7^assigned_to='+gr.u_devsysid,
+		};
 		
-		restMessage = new sn_ws.RESTMessageV2();
-		restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
-		restMessage.setHttpMethod('get');
-		restMessage.setEndpoint(endpointBase + 'incident_task');
-		restMessage.setQueryParameter('sysparm_query','active=true^assigned_to='+gr.u_devsysid+'^ORDERBYnumber');
-		result = restMessage.execute();
-		
-		if(result && result.getBody()) 
-			_userIncidents = JSON.parse(result.getBody());*/
+		_sc_task = rstMsg.executeGET(restParam);
 		
 		var user = gr.u_email;
 		
+		var getUserTasks = new GetUserTasks();
+		
 		try{
-			_task = getScrumTasks(_userTasks);
+			_task = getUserTasks.getTasks(_userTasks,'Development');
 		}
 		catch(err){
-			gs.error('Tasks Not Found: '+ err.toString());
+			gs.error('Tasks Not Found for '+user+': '+ err.toString());
 			_task = {};
 		}
 		
 		try{
-			_defect = getDefects(_userDefects);
+			_defect = getUserTasks.getTasks(_userDefects,'Defect');
 		}
 		catch(err){
-			gs.error('Defects Not Found: '+ err.toString());
+			gs.error('Defects Not Found for '+user+': '+ err.toString());
 			_defect = {};
 		}
 		
 		try{
-			_incident = getIncidents(_userIncidents);
+			_incident = getUserTasks.getTasks(_userIncidents,'IN');
 		}
 		catch(err){
-			gs.error('Incidents Not Found: '+ err.toString());
+			gs.error('Incidents Not Found for '+user+': '+ err.toString());
 			_incident = {};
+		}
+		
+		try{
+			_sc = getUserTasks.getTasks(_sc_task,'Catalog Task');
+		}
+		catch(err){
+			gs.error('Catalog Tasks Not Found for '+user+': '+ err.toString());
+			_sc = {};
 		}
 		
 		var tasks = {
 			first_name: gr.u_first_name.toString(),
 			scrumTasks: _task,
 			defects: _defect,
-			incidents: _incident
+			incidents: _incident,
+			sc: _sc
 		};
+		
+		if(gs.getProperty('x_snc_easytask.enablelog'))
+			gs.info('Tasks for '+user+': '+JSON.stringify(tasks));
+		
 		//Event is firing
 		gs.eventQueue('x_snc_easytask.logWorkHours', current, user, JSON.stringify(tasks));
 		
@@ -98,15 +119,15 @@ scheduler.getTasksByAssignedTo();]]></script>
         <sys_created_on>2017-08-28 12:21:42</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>ac8a75666f30c300f928c8c17c3ee4d9</sys_id>
-        <sys_mod_count>124</sys_mod_count>
-        <sys_name>Update Tasks Reminder</sys_name>
+        <sys_mod_count>181</sys_mod_count>
+        <sys_name>Update tasks reminder</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sysauto_script_ac8a75666f30c300f928c8c17c3ee4d9</sys_update_name>
-        <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-10-23 14:59:45</sys_updated_on>
+        <sys_updated_by>souvik.g</sys_updated_by>
+        <sys_updated_on>2017-11-29 06:52:43</sys_updated_on>
         <upgrade_safe>false</upgrade_safe>
     </sysauto_script>
 </record_update>

@@ -11,7 +11,7 @@
         <content_type>text/html</content_type>
         <description/>
         <event_name>x_snc_easytask.ManagerReport</event_name>
-        <event_parm_1>false</event_parm_1>
+        <event_parm_1>true</event_parm_1>
         <event_parm_2>false</event_parm_2>
         <exclude_delegates>false</exclude_delegates>
         <force_delivery>false</force_delivery>
@@ -28,7 +28,7 @@
 <p>${mail_script:tasksReport}&nbsp;</p>]]></message_html>
         <message_list/>
         <message_text/>
-        <name>SendManagerReport</name>
+        <name>Send manager report</name>
         <omit_watermark>false</omit_watermark>
         <order>100</order>
         <push_message_only>false</push_message_only>
@@ -48,16 +48,16 @@
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>f2e40e584f91c300afef74828110c7a9</sys_id>
-        <sys_mod_count>7</sys_mod_count>
-        <sys_name>SendManagerReport</sys_name>
+        <sys_mod_count>17</sys_mod_count>
+        <sys_name>Send manager report</sys_name>
         <sys_overrides/>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sysevent_email_action_f2e40e584f91c300afef74828110c7a9</sys_update_name>
-        <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-09-15 11:24:43</sys_updated_on>
+        <sys_updated_by>souvik.g</sys_updated_by>
+        <sys_updated_on>2017-11-14 15:41:37</sys_updated_on>
         <sys_version>2</sys_version>
         <template/>
         <type>email</type>

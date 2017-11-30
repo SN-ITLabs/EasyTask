@@ -12,42 +12,52 @@
             <item endquery="true" field="" goto="false" newquery="false" operator="=" or="false" value=""/>
         </filter_condition>
         <from/>
-        <name>DigestForEmail</name>
+        <name>Digest for email</name>
         <order>100</order>
         <reply_email/>
         <required_roles/>
         <script><![CDATA[(function runAction(/*GlideRecord*/ current, /*GlideRecord*/ event, /*EmailWrapper*/ email, /*ScopedEmailLogger*/ logger, /*EmailClassifier*/ classifier) {
-
+	
 	// Implement email action here
 	var active = true;
 	if(email.to.indexOf('+subscribe') == -1)
 		active = false;
+	
+	gs.info('Digest: '+active);
 	var restMessage = new sn_ws.RESTMessageV2();
+	var restMessageDetails = new RESTMessageSetup();
+	var result;
 	var endpointBase = 'https://' + gs.getProperty('x_snc_easytask.surf_instance_name') + '.service-now.com/api/now/table/';
+	restMessage.setEndpoint(endpointBase + 'sys_user');
 	restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
 	restMessage.setHttpMethod('get');
 	restMessage.setQueryParameter('sysparm_query','active=true^email='+email.from);
 	restMessage.setQueryParameter('sysparm_fields','first_name,sys_id');
-	var _user = JSON.parse(restMessage.execute().getBody());
-	var gr = new GlideRecord('x_snc_easytask_subscribedforemailnotifications');
-	gr.addQuery('u_devsysid',_user.result[0].sys_id);
-	gr.query();
-	if(gr.hasNext()){
-		gr.next();
-		gr.u_active = active;
-		gr.update();
-	}
-	else{
-		gr.initialize();
-		gr.u_active = active;
-		gr.u_devsysid = _user.result[0].sys_id;
-		gr.u_email = email.from;
-		gr.u_first_name = _user.result[0].first_name;
-		gr.insert();
-	}
-	gs.eventQueue('x_snc_easytask.subscriptionResponse',gr,email.from,email.subject);
-
-})(current, event, email, logger, classifier);]]></script>
+	result = restMessage.execute();
+	
+	gs.info(result.getBody());
+	var _user = {};
+		var gr = new GlideRecord('x_snc_easytask_subscribedforemailnotifications');
+		if(result && result.getBody()){
+			_user = JSON.parse(result.getBody());
+			gr.addQuery('u_devsysid',_user.result[0].sys_id);
+			gr.query();
+			if(gr.next()){
+				gr.u_active = active;
+				gr.update();
+			}
+			else{
+				gr.initialize();
+				gr.u_active = active;
+				gr.u_devsysid = _user.result[0].sys_id;
+				gr.u_email = email.from;
+				gr.u_first_name = _user.result[0].first_name;
+				gr.insert();
+			}
+		}
+		gs.eventQueue('x_snc_easytask.subscriptionResponse',gr,email.from,email.subject);
+		
+	})(current, event, email, logger, classifier);]]></script>
         <stop_processing>false</stop_processing>
         <sys_class_name>sysevent_in_email_action</sys_class_name>
         <sys_created_by>souvik</sys_created_by>
@@ -56,16 +66,16 @@
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>5b9d660a6f2d0f00f928c8c17c3ee4e2</sys_id>
-        <sys_mod_count>19</sys_mod_count>
-        <sys_name>DigestForEmail</sys_name>
+        <sys_mod_count>25</sys_mod_count>
+        <sys_name>Digest for email</sys_name>
         <sys_overrides/>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sysevent_in_email_action_5b9d660a6f2d0f00f928c8c17c3ee4e2</sys_update_name>
-        <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-10-25 11:12:16</sys_updated_on>
+        <sys_updated_by>souvik.ghosh</sys_updated_by>
+        <sys_updated_on>2017-11-06 07:06:14</sys_updated_on>
         <table>x_snc_easytask_subscribedforemailnotifications</table>
         <template/>
         <type>new</type>

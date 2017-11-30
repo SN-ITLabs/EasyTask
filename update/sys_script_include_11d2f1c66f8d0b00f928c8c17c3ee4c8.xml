@@ -14,10 +14,10 @@
 	restMessage.setBasicAuth(restMessageDetails.getUserName(),restMessageDetails.getPWD());
 	restMessage.setHttpMethod('get');
 	var gr,result;
-	var regex = new RegExp(/^((?:\S+\s+){2}\S+)/g); // gets first 3 words from a string
+	var regex = new RegExp(/^((?:\S+\s+){5}\S+)/g); // gets first 3 words from a string
 	var _task = {taskDetails: []};
 	for(var j = 0;j<_userTasks.result.length;j++){
-		restMessage.setEndpoint(_userTasks.result[j].parent.link);
+		restMessage.setEndpoint(_userTasks.result[j].story.link);
 		result = restMessage.execute();
 		var story_desc,story,task_dec;
 		if(result && result.getBody()) {
@@ -27,13 +27,13 @@
 			var regexRes = regex.exec(_userTasks.result[j].short_description.toString());
 			
 			
-			if(regexResult != null && story_details.substring(0,24).length > regexResult[0].length)
+			if(regexResult != null && story_details.substring(0,34).length > regexResult[0].length)
 				story_desc = regexResult[0] + '...';
 			
 			else
-				story_desc = story_details.length < story_details.substring(0,24) ? story_details : story_details.substring(0,24) + '...';
+				story_desc = story_details.length < story_details.substring(0,34) ? story_details : story_details.substring(0,34) + '...';
 			
-			if(regexRes != null && _userTasks.result[j].short_description.toString().substring(0,24).length > regexRes[0].length)
+			if(regexRes != null && _userTasks.result[j].short_description.toString().substring(0,34).length > regexRes[0].length)
 				task_dec = regexRes[0] + '...';
 			
 			else
@@ -46,22 +46,11 @@
 		gr.addQuery('u_task_id','=',_userTasks.result[j].number.toString());
 		gr.query();
 		if(gr.next()){
-			_today_logged_hours = Number(_userTasks.result[j].hours) - Number(gr.u_previous_hours);
-			_logged_hours_till_today = Number(_userTasks.result[j].hours) - _today_logged_hours;
-			gr.u_previous_hours = gr.u_hours;
-			gr.u_previous_state = gr.u_state;
-			gr.u_state = Number(_userTasks.result[j].state);
-			gr.u_hours = Number(_userTasks.result[j].hours);
-			gr.update();
+			_today_logged_hours = Number(_userTasks.result[j].hours) - Number(gr.u_hours);
+			_logged_hours_till_today = Number(gr.u_hours);
 		}
 		else{
-			gr.u_hours = Number(_userTasks.result[j].hours);
-			gr.u_state = Number(_userTasks.result[j].state);
-			gr.u_previous_hours = gr.u_hours;
-			gr.u_previous_state = gr.u_state;
-			gr.u_task_id = _userTasks.result[j].number.toString();
-			_today_logged_hours = gr.u_hours;
-			gr.insert();
+			_today_logged_hours = Number(_userTasks.result[j].hours);
 		}
 		var _taskDetails = {
 			number: _userTasks.result[j].number.toString(),
@@ -82,14 +71,14 @@
         <sys_created_on>2017-09-08 08:46:56</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>11d2f1c66f8d0b00f928c8c17c3ee4c8</sys_id>
-        <sys_mod_count>14</sys_mod_count>
+        <sys_mod_count>22</sys_mod_count>
         <sys_name>getScrumTasks</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy>read</sys_policy>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_include_11d2f1c66f8d0b00f928c8c17c3ee4c8</sys_update_name>
-        <sys_updated_by>souvik</sys_updated_by>
-        <sys_updated_on>2017-10-23 15:33:30</sys_updated_on>
+        <sys_updated_by>souvik.ghosh</sys_updated_by>
+        <sys_updated_on>2017-11-07 11:53:59</sys_updated_on>
     </sys_script_include>
 </record_update>

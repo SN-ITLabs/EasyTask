@@ -11,7 +11,7 @@
         <sys_class_name>sys_properties</sys_class_name>
         <sys_created_by>chaitanya</sys_created_by>
         <sys_created_on>2017-10-23 12:36:35</sys_created_on>
-        <sys_customer_update>true</sys_customer_update>
+        <sys_customer_update>false</sys_customer_update>
         <sys_id>24c69224db028b40a86a5404ce96196e</sys_id>
         <sys_mod_count>2</sys_mod_count>
         <sys_name>x_snc_easytask.surf_user_pwd</sys_name>
