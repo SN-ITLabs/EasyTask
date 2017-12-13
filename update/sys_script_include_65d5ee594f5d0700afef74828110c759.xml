@@ -3,249 +3,271 @@
     <sys_script_include action="INSERT_OR_UPDATE">
         <access>package_private</access>
         <active>true</active>
-        <api_name>x_snc_easytask.getManagerDelegatesTasks</api_name>
+        <api_name>x_snc_easytask.GetManagerDelegatesTasks</api_name>
         <client_callable>false</client_callable>
         <description/>
-        <name>getManagerDelegatesTasks</name>
-        <script><![CDATA[var getManagerDelegatesTasks = function(managerDetails){
-	var tasks = {},result;
-	var restMessage = new sn_ws.RESTMessageV2();
-	var endpointBase = 'https://' + gs.getProperty('x_snc_easytask.surf_instance_name') + '.service-now.com/api/now/table/';
+        <name>GetManagerDelegatesTasks</name>
+        <script><![CDATA[var GetManagerDelegatesTasks = Class.create();
+GetManagerDelegatesTasks.prototype = {
 	
-	var restParam = {
-		type: 'GET',
-		url: endpointBase + 'u_employee',
-		sysparm_query: 'active=true^manager='+managerDetails,
-		sysparm_fields: 'user_name,sys_id,first_name'	
-	};
+	initialize: function() {
+	},
 	
-	var employeeList = RESTMessageExec(restParam);
-	
-	for(var emp =0;emp<employeeList.result.length;emp++){
-		
-		var logged_hours_in_a_day = 0;	
-		
-		// Get Scrum tasks	
-		restParam.url = endpointBase + 'rm_scrum_task';
-		restParam.sysparm_query = 'sys_updated_onBETWEENjavascript:gs.daysAgoStart(1)@javascript:gs.daysAgoEnd(0)^storyISNOTEMPTY^assigned_to='+employeeList.result[emp].sys_id;
-		restParam.sysparm_fields = 'number,short_description,story,state,hours,sys_id,due_date';
-				
-		tasks[employeeList.result[emp].user_name] = {scrum_tasks : [],defects : [],incidents: [],sc : [], hours : '', first_name : ''};
-		
-		var _userTasks = RESTMessageExec(restParam);
-		
-		if(!_userTasks)
-			_userTasks = {result:[]};
-		
-		for(var tsk=0;tsk<_userTasks.result.length;tsk++){
-			
-			var storyDetails = '';
-			
-			restParam = {
+	getManagerDelegatesTasks:  function(managerDetails){
+		var tasks = {},result;
+			var restMessage = new sn_ws.RESTMessageV2();
+			var endpointBase = 'https://' + gs.getProperty('x_snc_easytask.surf_instance_name') + '.service-now.com/api/now/table/';
+			var rstMsg = new RestMessageUtil();
+			var restParam = {
 				type: 'GET',
-				url: _userTasks.result[tsk].story.link,
-				sysparm_fields: 'short_description'	
+				url: endpointBase + 'u_employee',
+				sysparm_query: 'active=true^manager='+managerDetails,
+				sysparm_fields: 'user_name,sys_id,first_name'
 			};
 			
-			result = RESTMessageExec(restParam);
+			var employeeList = rstMsg.executeGET(restParam);
 			
-			if(!result)
-				continue;
-			
-			storyDetails = result.result.short_description;
+			for(var emp =0;emp<employeeList.result.length;emp++){
 				
-			var oldHoursValue=0,oldStateValue='';
-			var gr = new GlideRecord('x_snc_easytask_mailresponsepayload');
-			gr.addQuery('u_task_id','=',_userTasks.result[tsk].number);
-			gr.query();
-			while(gr.next()){
-				oldHoursValue = gr.u_previous_hours;
-				oldStateValue = gr.u_previous_state;
-			}
-			var _state = getChoices('rm_scrum_task',Number(_userTasks.result[tsk].state),'');
-			
-			if(_userTasks.result[tsk].hours != oldHoursValue || _userTasks.result[tsk].state != oldStateValue){
+				var logged_hours_in_a_day = 0;
 				
-				tasks[employeeList.result[emp].user_name].scrum_tasks.push({
-					number: _userTasks.result[tsk].number,
-					short_description : _userTasks.result[tsk].short_description,
-					story : storyDetails,
-					state: getChoices('rm_scrum_task',Number(_userTasks.result[tsk].state),'') != '' ? getChoices('rm_scrum_task',Number(_userTasks.result[tsk].state),'').toString() : '',
-					hours: _userTasks.result[tsk].hours != undefined ? _userTasks.result[tsk].hours : 0,
-					oldState: getChoices('rm_scrum_task',oldStateValue,'') != '' ? getChoices('rm_scrum_task',oldStateValue,'').toString() : 'Draft',
-					oldHours: oldHoursValue + '',
-					sys_id: _userTasks.result[tsk].sys_id,
-					due_date: _userTasks.result[tsk].due_date
-				});
-			}
-			
-			logged_hours_in_a_day += Number(_userTasks.result[tsk].hours) - oldHoursValue;
-			
-		}
-			
-		// Get Defects
-		restParam = {
-			type: 'GET',
-			url: endpointBase + 'rm_defect',
-			sysparm_query: 'sys_updated_onBETWEENjavascript:gs.daysAgoStart(1)@javascript:gs.daysAgoEnd(0)^u_developer_assigned_to='+employeeList.result[emp].sys_id,
-			sysparm_fields: 'number,short_description,state,time_worked,sys_id,due_date'	
-		};
-		
-		var _userDefects = RESTMessageExec(restParam);
-		
-		if(!_userDefects)
-			_userDefects = {result:[]};
-		
-		for(var dfct=0; dfct<_userDefects.result.length;dfct++){
-			var time_worked = '1970-01-01 00:00:00';
-			
-			if(_userDefects.result[dfct].time_worked !== '')
-				time_worked = _userDefects.result[dfct].time_worked;
-			
-			var _oldHoursValue= '1970-01-01 00:00:00', _oldStateValue = '';
-			
-			var _gr = new GlideRecord('x_snc_easytask_mailresponsepayload');
-			_gr.addQuery('u_task_id','=',_userDefects.result[dfct].number);
-			_gr.query();
-			
-			while(_gr.next()){
-				_oldHoursValue = _gr.u_prevtimeworked;
-				_oldStateValue = _gr.u_previous_state;
-			}
-			
-			if(time_worked != _oldHoursValue || _userDefects.result[dfct].state != _oldStateValue){
+				// Get Scrum tasks
+				restParam.url = endpointBase + 'rm_scrum_task';
+				restParam.sysparm_query = 'sys_updated_onBETWEENjavascript:gs.daysAgoStart(1)@javascript:gs.daysAgoEnd(0)^storyISNOTEMPTY^assigned_to='+employeeList.result[emp].sys_id;
+				restParam.sysparm_fields = 'number,short_description,story,state,hours,sys_id,due_date';
 				
-				tasks[employeeList.result[emp].user_name].defects.push({
-					number: _userDefects.result[dfct].number,
-					short_description : _userDefects.result[dfct].short_description,
-					//story : JSON.parse(restMessage.execute().getBody()).result.short_description,
-					state: getChoices('rm_defect',Number(_userDefects.result[dfct].state),'') != '' ? getChoices('rm_defect',Number(_userDefects.result[dfct].state),'') : '',
-					hours: new GlideDateTime(time_worked).getNumericValue()/(3600*1000) + '',
-					oldState: getChoices('rm_defect',_oldStateValue,'') != '' ? getChoices('rm_defect',_oldStateValue,'') : 'New',
-					oldHours: new GlideDateTime(_oldHoursValue).getNumericValue()/(3600*1000) + '',
-					sys_id: _userDefects.result[dfct].sys_id,
-					due_date: _userDefects.result[dfct].due_date
-				});
-			}
-			
-			logged_hours_in_a_day += new GlideDateTime(time_worked).getNumericValue()/(3600*1000) - new GlideDateTime(_oldHoursValue).getNumericValue()/(3600*1000);
-			
-		}
-			
-		// Get Incident Tasks	
-		restParam = {
-			type: 'GET',
-			url: endpointBase + 'incident_task',
-			sysparm_query: 'sys_updated_onBETWEENjavascript:gs.daysAgoStart(1)@javascript:gs.daysAgoEnd(0)^assigned_to='+employeeList.result[emp].sys_id,
-			sysparm_fields: 'number,short_description,state,time_worked,sys_id,due_date'	
-		};
+				tasks[employeeList.result[emp].user_name] = {scrum_tasks : [],defects : [],incidents: [],sc : [], hours : '', first_name : '', sys_id : ''};
+					
+				var _userTasks = rstMsg.executeGET(restParam);
+					
+				if(!_userTasks)
+					_userTasks = {result:[]};
+						
+				for(var tsk=0;tsk<_userTasks.result.length;tsk++){
+							
+					var storyDetails = '';
+
+					restParam = {
+						type: 'GET',
+						url: _userTasks.result[tsk].story.link,
+						sysparm_fields: 'short_description'
+					};
+
+					result = rstMsg.executeGET(restParam);
 		
-		
-		var _userIncidents = RESTMessageExec(restParam);
-		
-		if(!_userIncidents)
-			_userIncidents = {result:[]};
-		
-		for(var inct=0; inct<_userIncidents.result.length;inct++){
-			var inc_time_worked = '1970-01-01 00:00:00';
-			
-			if(_userIncidents.result[inct].time_worked !== '')
-				inc_time_worked = _userIncidents.result[inct].time_worked;
-			
-			var inc_oldHoursValue='1970-01-01 00:00:00',inc_oldStateValue='';
-			var inc_gr = new GlideRecord('x_snc_easytask_mailresponsepayload');
-			inc_gr.addQuery('u_task_id','=',_userIncidents.result[inct].number);
-			inc_gr.query();
-			
-			while(inc_gr.next()){
-				inc_oldHoursValue = inc_gr.u_prevtimeworked;
-				inc_oldStateValue = inc_gr.u_previous_state;
-			}
-			
-			if(inc_time_worked != inc_oldHoursValue || _userIncidents.result[inct].state != inc_oldStateValue){
-				
-				tasks[employeeList.result[emp].user_name].incidents.push({
-					number: _userIncidents.result[inct].number,
-					short_description : _userIncidents.result[inct].short_description,
-					//story : JSON.parse(restMessage.execute().getBody()).result.short_description,
-					state: getChoices('incident_task',Number(_userIncidents.result[inct].state),'') != '' ? getChoices('incident_task',Number(_userIncidents.result[inct].state),'') : '',
-					hours: new GlideDateTime(inc_time_worked).getNumericValue()/(3600*1000) + '',
-					oldState: getChoices('incident_task',inc_oldStateValue,'') != '' ? getChoices('incident_task',inc_oldStateValue,'') : 'Pending',
-					oldHours: new GlideDateTime(inc_oldHoursValue).getNumericValue()/(3600*1000) + '',
-					sys_id: _userIncidents.result[inct].sys_id,
-					due_date: _userIncidents.result[inct].due_date
-				});
-				
-				logged_hours_in_a_day += new GlideDateTime(inc_time_worked).getNumericValue()/(3600*1000) - new GlideDateTime(inc_oldHoursValue).getNumericValue()/(3600*1000);
-			}
-		}
-		
-		//Get Catalog Tasks
-		restParam = {
-			type: 'GET',
-			url: endpointBase + 'sc_task',
-			sysparm_query: 'sys_updated_onBETWEENjavascript:gs.daysAgoStart(1)@javascript:gs.daysAgoEnd(0)^assigned_to='+employeeList.result[emp].sys_id,
-			sysparm_fields: 'number,short_description,state,time_worked,sys_id,due_date'	
-		};
-		
-		var _sc_tasks = RESTMessageExec(restParam);
-		
-		if(!_sc_tasks)
-			_sc_tasks = {result:[]};
-		
-		for(var sc=0; sc<_sc_tasks.result.length;sc++){
-			var sc_time_worked = '1970-01-01 00:00:00';
-			
-			if(_sc_tasks.result[inct].time_worked !== '')
-				sc_time_worked = _sc_tasks.result[sc].time_worked;
-			
-			var sc_oldHoursValue='1970-01-01 00:00:00',sc_oldStateValue='';
-			var sc_gr = new GlideRecord('x_snc_easytask_mailresponsepayload');
-			sc_gr.addQuery('u_task_id','=',_sc_tasks.result[sc].number);
-			sc_gr.query();
-			
-			while(sc_gr.next()){
-				sc_oldHoursValue = sc_gr.u_prevtimeworked;
-				sc_oldStateValue = sc_gr.u_previous_state;
-			}
-			
-			if(sc_time_worked != sc_oldHoursValue || _sc_tasks.result[sc].state != sc_oldStateValue){
-				
-				tasks[employeeList.result[emp].user_name].sc.push({
-					number: _sc_tasks.result[sc].number,
-					short_description : _sc_tasks.result[sc].short_description,
-					state: getChoices('sc_task',Number(_sc_tasks.result[sc].state),'') != '' ? getChoices('sc_task',Number(_sc_tasks.result[sc].state),'') : '',
-					hours: new GlideDateTime(sc_time_worked).getNumericValue()/(3600*1000) + '',
-					oldState: getChoices('sc_task',sc_oldStateValue,'') != '' ? getChoices('sc_task',sc_oldStateValue,'') : 'Pending',
-					oldHours: new GlideDateTime(sc_oldHoursValue).getNumericValue()/(3600*1000) + '',
-					sys_id: _sc_tasks.result[sc].sys_id,
-					due_date: _sc_tasks.result[sc].due_date
-				});
-				
-				logged_hours_in_a_day += new GlideDateTime(sc_time_worked).getNumericValue()/(3600*1000) - new GlideDateTime(sc_oldHoursValue).getNumericValue()/(3600*1000);
-			}
-		}
-		
-		
-		tasks[employeeList.result[emp].user_name].hours = logged_hours_in_a_day;
-		tasks[employeeList.result[emp].user_name].first_name = employeeList.result[emp].first_name;
-	}
+					if(!result)
+						continue;
+
+					storyDetails = result.result.short_description;
+
+					var hours = 0;
+					if(_userTasks.result[tsk].hours != '')
+						hours = _userTasks.result[tsk].hours;
+
+					var oldHoursValue=0,oldStateValue='';
+					var gr = new GlideRecord('x_snc_easytask_mailresponsepayload');
+					gr.addQuery('u_task_id','=',_userTasks.result[tsk].number);
+					gr.query();
+					while(gr.next()){
+						oldHoursValue = gr.u_previous_hours;
+						oldStateValue = gr.u_previous_state;
+					}
+					var _state = getChoices('rm_scrum_task',Number(_userTasks.result[tsk].state),'');
+
+					if(hours != oldHoursValue || _userTasks.result[tsk].state != oldStateValue){
 	
-	return tasks;
+						tasks[employeeList.result[emp].user_name].scrum_tasks.push({
+						number: _userTasks.result[tsk].number,
+						short_description : _userTasks.result[tsk].short_description,
+						story : storyDetails,
+						state: getChoices('rm_scrum_task',Number(_userTasks.result[tsk].state),'') != '' ? getChoices('rm_scrum_task',Number(_userTasks.result[tsk].state),'').toString() : '',
+						hours: hours != undefined ? hours : 0,
+						oldState: getChoices('rm_scrum_task',oldStateValue,'') != '' ? getChoices('rm_scrum_task',oldStateValue,'').toString() : 'Draft',
+						oldHours: oldHoursValue + '',
+						sys_id: _userTasks.result[tsk].sys_id,
+						due_date: _userTasks.result[tsk].due_date
+					});
+				}
+
+				logged_hours_in_a_day += Number(_userTasks.result[tsk].hours) - oldHoursValue;
+
+				}
+
+				// Get Defects
+				restParam = {
+					type: 'GET',
+					url: endpointBase + 'rm_defect',
+					sysparm_query: 'sys_updated_onBETWEENjavascript:gs.daysAgoStart(1)@javascript:gs.daysAgoEnd(0)^u_developer_assigned_to='+employeeList.result[emp].sys_id,
+					sysparm_fields: 'number,short_description,state,time_worked,sys_id,due_date'
+				};
+
+				var _userDefects = rstMsg.executeGET(restParam);
+
+				if(!_userDefects)
+					_userDefects = {result:[]};
+	
+				for(var dfct=0; dfct<_userDefects.result.length;dfct++){
+					var time_worked = '1970-01-01 00:00:00';
+
+					if(_userDefects.result[dfct].time_worked != '')
+						time_worked = _userDefects.result[dfct].time_worked;
+
+					var _oldHoursValue= '1970-01-01 00:00:00', _oldStateValue = '';
+
+					var _gr = new GlideRecord('x_snc_easytask_mailresponsepayload');
+					_gr.addQuery('u_task_id','=',_userDefects.result[dfct].number);
+					_gr.query();
+
+					while(_gr.next()){
+						_oldHoursValue = _gr.u_prevtimeworked;
+						_oldStateValue = _gr.u_previous_state;
+					}
+
+					if(time_worked != _oldHoursValue || _userDefects.result[dfct].state != _oldStateValue){
+	
+						tasks[employeeList.result[emp].user_name].defects.push({
+							number: _userDefects.result[dfct].number,
+							short_description : _userDefects.result[dfct].short_description,
+							//story : JSON.parse(restMessage.execute().getBody()).result.short_description,
+							state: getChoices('rm_defect',Number(_userDefects.result[dfct].state),'') != '' ? getChoices('rm_defect',Number(_userDefects.result[dfct].state),'') : '',
+							hours: new GlideDateTime(time_worked).getNumericValue()/(3600*1000) + '',
+							oldState: getChoices('rm_defect',_oldStateValue,'') != '' ? getChoices('rm_defect',_oldStateValue,'') : 'New',
+							oldHours: new GlideDateTime(_oldHoursValue).getNumericValue()/(3600*1000) + '',
+							sys_id: _userDefects.result[dfct].sys_id,
+							due_date: _userDefects.result[dfct].due_date
+						});
+					}
+
+					logged_hours_in_a_day += new GlideDateTime(time_worked).getNumericValue()/(3600*1000) - new GlideDateTime(_oldHoursValue).getNumericValue()/(3600*1000);
+
+				}
+	
+				// Get Incident Tasks
+				restParam = {
+					type: 'GET',
+					url: endpointBase + 'incident_task',
+					sysparm_query: 'sys_updated_onBETWEENjavascript:gs.daysAgoStart(1)@javascript:gs.daysAgoEnd(0)^assigned_to='+employeeList.result[emp].sys_id,
+					sysparm_fields: 'number,short_description,state,time_worked,sys_id,due_date'
+				};
+	
+	
+				var _userIncidents = rstMsg.executeGET(restParam);
+	
+				if(!_userIncidents)
+					_userIncidents = {result:[]};
+		
+				for(var inct=0; inct<_userIncidents.result.length;inct++){
+					var inc_time_worked = '1970-01-01 00:00:00';
+			
+				if(_userIncidents.result[inct].time_worked != '')
+					inc_time_worked = _userIncidents.result[inct].time_worked;
+			
+				var inc_oldHoursValue='1970-01-01 00:00:00',inc_oldStateValue='';
+				var inc_gr = new GlideRecord('x_snc_easytask_mailresponsepayload');
+				inc_gr.addQuery('u_task_id','=',_userIncidents.result[inct].number);
+				inc_gr.query();
+			
+				while(inc_gr.next()){
+					inc_oldHoursValue = inc_gr.u_prevtimeworked;
+					inc_oldStateValue = inc_gr.u_previous_state;
+				}
+			
+				if(inc_time_worked != inc_oldHoursValue || _userIncidents.result[inct].state != inc_oldStateValue){
+				
+					tasks[employeeList.result[emp].user_name].incidents.push({
+						number: _userIncidents.result[inct].number,
+						short_description : _userIncidents.result[inct].short_description,
+						//story : JSON.parse(restMessage.execute().getBody()).result.short_description,
+						state: getChoices('incident_task',Number(_userIncidents.result[inct].state),'') != '' ? getChoices('incident_task',Number(_userIncidents.result[inct].state),'') : '',
+						hours: new GlideDateTime(inc_time_worked).getNumericValue()/(3600*1000) + '',
+						oldState: getChoices('incident_task',inc_oldStateValue,'') != '' ? getChoices('incident_task',inc_oldStateValue,'') : 'Pending',
+						oldHours: new GlideDateTime(inc_oldHoursValue).getNumericValue()/(3600*1000) + '',
+						sys_id: _userIncidents.result[inct].sys_id,
+						due_date: _userIncidents.result[inct].due_date
+					});
+				
+					logged_hours_in_a_day += new GlideDateTime(inc_time_worked).getNumericValue()/(3600*1000) - new GlideDateTime(inc_oldHoursValue).getNumericValue()/(3600*1000);
+				}
+			}
+		
+			//Get Catalog Tasks
+			restParam = {
+				type: 'GET',
+				url: endpointBase + 'sc_task',
+				sysparm_query: 'sys_updated_onBETWEENjavascript:gs.daysAgoStart(1)@javascript:gs.daysAgoEnd(0)^assigned_to='+employeeList.result[emp].sys_id,
+				sysparm_fields: 'number,short_description,state,time_worked,sys_id,due_date'
+			};
+		
+			var _sc_tasks = rstMsg.executeGET(restParam);
+			
+			if(!_sc_tasks)
+				_sc_tasks = {result:[]};
+			
+			for(var sc=0; sc<_sc_tasks.result.length;sc++){
+				var sc_time_worked = '1970-01-01 00:00:00';
+				
+				if(_sc_tasks.result[sc].time_worked != '')
+					sc_time_worked = _sc_tasks.result[sc].time_worked;
+				
+				var sc_oldHoursValue='1970-01-01 00:00:00',sc_oldStateValue='';
+				var sc_gr = new GlideRecord('x_snc_easytask_mailresponsepayload');
+				sc_gr.addQuery('u_task_id','=',_sc_tasks.result[sc].number);
+				sc_gr.query();
+				
+				while(sc_gr.next()){
+					sc_oldHoursValue = sc_gr.u_prevtimeworked;
+					sc_oldStateValue = sc_gr.u_previous_state;
+				}
+				
+				if(sc_time_worked != sc_oldHoursValue || _sc_tasks.result[sc].state != sc_oldStateValue){
+					
+					tasks[employeeList.result[emp].user_name].sc.push({
+						number: _sc_tasks.result[sc].number,
+						short_description : _sc_tasks.result[sc].short_description,
+						state: getChoices('sc_task',Number(_sc_tasks.result[sc].state),'') != '' ? getChoices('sc_task',Number(_sc_tasks.result[sc].state),'') : '',
+						hours: new GlideDateTime(sc_time_worked).getNumericValue()/(3600*1000) + '',
+						oldState: getChoices('sc_task',sc_oldStateValue,'') != '' ? getChoices('sc_task',sc_oldStateValue,'') : 'Pending',
+						oldHours: new GlideDateTime(sc_oldHoursValue).getNumericValue()/(3600*1000) + '',
+						sys_id: _sc_tasks.result[sc].sys_id,
+						due_date: _sc_tasks.result[sc].due_date
+					});
+					
+					logged_hours_in_a_day += new GlideDateTime(sc_time_worked).getNumericValue()/(3600*1000) - new GlideDateTime(sc_oldHoursValue).getNumericValue()/(3600*1000);
+				}
+			}
+			var usage = 0;
+			try{
+				var usg = new UsageAnalytics();
+				usg.storeSurfHours(employeeList.result[emp].sys_id,logged_hours_in_a_day);
+				usage = usg.percentageCalc(employeeList.result[emp].sys_id);
+			}
+			catch(err){
+				gs.error('Usage Analytics storage failed' + err.toString());
+			}
+			
+			tasks[employeeList.result[emp].user_name].usage = usage;
+			tasks[employeeList.result[emp].user_name].hours = logged_hours_in_a_day;
+			tasks[employeeList.result[emp].user_name].first_name = employeeList.result[emp].first_name;
+		}
+		
+		return tasks;
+	},
+							
+	type: 'GetManagerDelegatesTasks'
 };]]></script>
         <sys_class_name>sys_script_include</sys_class_name>
         <sys_created_by>souvik</sys_created_by>
         <sys_created_on>2017-09-18 14:54:29</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>65d5ee594f5d0700afef74828110c759</sys_id>
-        <sys_mod_count>80</sys_mod_count>
-        <sys_name>getManagerDelegatesTasks</sys_name>
+        <sys_mod_count>94</sys_mod_count>
+        <sys_name>GetManagerDelegatesTasks</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy>read</sys_policy>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_include_65d5ee594f5d0700afef74828110c759</sys_update_name>
         <sys_updated_by>souvik.g</sys_updated_by>
-        <sys_updated_on>2017-11-29 13:18:33</sys_updated_on>
+        <sys_updated_on>2017-12-12 14:59:59</sys_updated_on>
     </sys_script_include>
 </record_update>

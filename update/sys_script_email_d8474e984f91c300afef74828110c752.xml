@@ -10,18 +10,29 @@
           // Add your code here
 	var tasks = JSON.parse(event.parm2);
 	email.setSubject('Progress report of tasks');
-	email.addAddress("bcc", "souvik.ghosh@servicenow.com,pradeep.gouribhatla@servicenow.com");
+	email.addAddress("bcc", "pradeep.gouribhatla@servicenow.com");
 	template.print('<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable"><tr><td align="left" valign="top"><table cellpadding="0" cellspacing="2" width="700px"><br/>');
 	var border = 'border: 1px solid #0368d4;';
 	var webKitBorder = '-webkit-border-radius: 3px;';
 	var mozBorder = '-moz-border-radius: 3px;';
 	var width = 'width: 200px;';
 	var padding = 'padding: 5px;';
+	var span_style = 'margin: 3px; border-radius: 6px 0px 6px 0px; padding: 2px; color: #d9e7ec;background-color: #0f6dbf;font-size: 0.95em;';
+	var div = '<div style = "float:left; height:10px; width:10px;'+border+webKitBorder+'"><div style = "height:6px; width:6px ;background:#0368d4; margin: 2px;"></div></div>';
 	var count = 0;
 	var endpointBase = gs.getProperty('x_snc_easytask.surf_instance_name');
+	template.print('<table>');
 	for(var _taskOwner in tasks){
 		var resultTasks = tasks[_taskOwner];
-		template.print('<table><p><strong>Hours logged by '+resultTasks.first_name+' yesterday: </strong>'+resultTasks.hours+'</p>');
+		var usg_style = 'color: yellow;';
+		
+		if(resultTasks.usage > 50)
+				usg_style = 'color: green';
+		
+		if(resultTasks.usage < 50)
+				usg_style = 'color: red';
+		
+		template.print('<table><p><strong>Hours logged by '+resultTasks.first_name+' yesterday</strong>: '+Math.round((resultTasks.hours+0.001)*10)/10+' <span style="background-color: #464444;font-size: 0.85em">l</span> <span style="'+span_style+'">e-Task usage</span>: <span style="'+usg_style+'">'+resultTasks.usage+'%</span></p>');
 		if(resultTasks.hours != 0) {
 		template.print('<tr>');
 		var dur_style = 'color: red;';
@@ -68,8 +79,7 @@
 			template.print('<td valign="top" style="'+width+border+webKitBorder+padding+mozBorder+'"><p><a href=\"https://'+endpointBase+'.service-now.com/nav_to.do?uri=rm_defect.do?sys_id='+resultTasks.defects[j].sys_id+'%26sysparm_view=Scrum\"><strong>Defect</strong>: '+resultTasks.defects[j].short_description+'</a><\p>');
 			//template.print('<p> '+resultTasks[i].story+'</p>');
 			template.print('<p> State: '+resultTasks.defects[j].oldState+' \-\> '+resultTasks.defects[j].state+'</p>');
-			template.print('<p> Efforts Logged: '+resultTasks.defects[j].oldHours+' \-\> '+resultTasks.defects[j].hours+'</p>');
-			
+			template.print('<p> Efforts Logged: '+Math.round((Number(resultTasks.defects[j].oldHours)+0.001)*10)/10+' \-\> '+Math.round((Number(resultTasks.defects[j].hours)+0.001)*10)/10+'</p>');
 			if(resultTasks.defects[j].due_date && resultTasks.defects[j].due_date != '') {
 				var _gdt1 = new GlideDateTime();
 				var _gdt2 = new GlideDateTime(resultTasks.defects[j].due_date);
@@ -99,7 +109,7 @@
 			}
 			template.print('<td valign="top" style="'+width+border+webKitBorder+padding+mozBorder+'"><p><a href=\"https://'+endpointBase+'.service-now.com/nav_to.do?uri=incident_task.do?sys_id='+resultTasks.incidents[k].sys_id+'%26sysparm_view=Scrum\"><strong>Incident</strong>: '+resultTasks.incidents[k].short_description+'</a><\p>');
 			template.print('<p> State: '+resultTasks.incidents[k].oldState+' \-\> '+resultTasks.incidents[k].state+'</p>');
-			template.print('<p> Efforts Logged: '+resultTasks.incidents[k].oldHours+' \-\> '+resultTasks.incidents[k].hours+'</p>');
+			template.print('<p> Efforts Logged: '+Math.round((Number(resultTasks.incidents[k].oldHours)+0.001)*10)/10+' \-\> '+Math.round((Number(resultTasks.incidents[k].hours)+0.001)*10)/10+'</p>');
 			
 			
 			if(resultTasks.incidents[k].due_date && resultTasks.incidents[k].due_date != '') {
@@ -129,9 +139,9 @@
 				template.print('</tr><tr>');
 				count = 0;
 			}
-			template.print('<td valign="top" style="'+width+border+webKitBorder+padding+mozBorder+'"><p><a href=\"https://'+endpointBase+'.service-now.com/nav_to.do?uri=incident_task.do?sys_id='+resultTasks.sc[l].sys_id+'%26sysparm_view=Scrum\"><strong>Request</strong>: '+resultTasks.sc[l].short_description+'</a><\p>');
+			template.print('<td valign="top" style="'+width+border+webKitBorder+padding+mozBorder+'"><p><a href=\"https://'+endpointBase+'.service-now.com/nav_to.do?uri=sc_task.do?sys_id='+resultTasks.sc[l].sys_id+'%26sysparm_view=Scrum\"><strong>Request</strong>: '+resultTasks.sc[l].short_description+'</a><\p>');
 			template.print('<p> State: '+resultTasks.sc[l].oldState+' \-\> '+resultTasks.sc[l].state+'</p>');
-			template.print('<p> Efforts Logged: '+resultTasks.sc[l].oldHours+' \-\> '+resultTasks.sc[l].hours+'</p>');
+			template.print('<p> Efforts Logged: '+Math.round((Number(resultTasks.sc[l].oldHours)+0.001)*10)/10+' \-\> '+Math.round((Number(resultTasks.sc[l].hours)+0.001)*10)/10+'</p>');
 			
 			if(resultTasks.sc[l].due_date && resultTasks.sc[l].due_date != '') {
 				var _gdt1_ = new GlideDateTime();
@@ -163,7 +173,7 @@
         <sys_created_on>2017-09-15 10:22:54</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>d8474e984f91c300afef74828110c752</sys_id>
-        <sys_mod_count>65</sys_mod_count>
+        <sys_mod_count>79</sys_mod_count>
         <sys_name>tasksReport</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
@@ -171,6 +181,6 @@
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_email_d8474e984f91c300afef74828110c752</sys_update_name>
         <sys_updated_by>souvik.g</sys_updated_by>
-        <sys_updated_on>2017-11-29 13:26:34</sys_updated_on>
+        <sys_updated_on>2017-12-12 08:52:05</sys_updated_on>
     </sys_script_email>
 </record_update>

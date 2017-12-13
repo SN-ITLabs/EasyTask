@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <record_update table="sys_script_include">
     <sys_script_include action="INSERT_OR_UPDATE">
-        <access>package_private</access>
+        <access>public</access>
         <active>true</active>
         <api_name>x_snc_easytask.UpdateTasksViaRest</api_name>
         <client_callable>false</client_callable>
@@ -61,45 +61,48 @@ UpdateTasksViaRest.prototype = {
 			return;
 		
 		var result_counter = 0;
+		var hours = 0;
 		
 		for (var eachTask in parsedJSON){
-			var task = {};
-			var _state = parsedJSON[eachTask].taskAttributes.state;
-			var _hours_dec = Number(parsedJSON[eachTask].taskAttributes.hours) + Number(parsedJSON[eachTask].taskAttributes.logged_hours);
-			if(table != 'rm_scrum_task'){
-				var time_worked = this._setTime_Worked(_hours_dec);
-				task = {
-					"time_worked":time_worked,
-					"state":_state 
+			
+			if(Number(parsedJSON[eachTask].taskAttributes.hours) > 0){
+				var task = {};
+				var _state = parsedJSON[eachTask].taskAttributes.state;
+				var _hours_dec = Number(parsedJSON[eachTask].taskAttributes.hours) + Number(parsedJSON[eachTask].taskAttributes.logged_hours);
+				if(table != 'rm_scrum_task'){
+					var time_worked = this._setTime_Worked(_hours_dec);
+					task = {
+						"time_worked":time_worked,
+						"state":_state 
+					};
+				}else
+					task = {
+						"hours":_hours_dec,
+						"state":_state 
+					};
+			
+				if(this.log)
+					gs.info('TaskToUpdate: '+JSON.stringify(task)+' '+table+' '+tasks.result[result_counter].number);
+			
+				hours = hours + Number(parsedJSON[eachTask].taskAttributes.hours);
+				var restParam = {
+					type: 'PUT',
+					url: this.endpointBase + table + '/' + tasks.result[result_counter].sys_id,
+					requestBody: JSON.stringify(task)
 				};
+			
+				result_counter++;
+			
+				var _response = this._executePOST(restParam);
+			
+				if(_response == '' || _response == undefined)
+					continue;
+			
+				response[eachTask] = this._returnResponse(_response,table);
 			}
-			
-			else 
-				task = {
-					"hours":_hours_dec,
-					"state":_state 
-				};
-			
-			if(this.log)
-				gs.info('TaskToUpdate: '+JSON.stringify(task)+' '+table+' '+tasks.result[result_counter].number);
-			
-			
-			var restParam = {
-				type: 'PUT',
-				url: this.endpointBase + table + '/' + tasks.result[result_counter].sys_id,
-				requestBody: JSON.stringify(task)
-			};
-			
-			result_counter++;
-			
-			var _response = this._executePOST(restParam);
-			
-			if(_response == '')
-				continue;
-			
-			response[eachTask] = this._returnResponse(_response,table);
 		}
-		return response;
+		
+		return {response: response, hours: hours};
 		
 	},
 	
@@ -223,7 +226,7 @@ UpdateTasksViaRest.prototype = {
         <sys_created_on>2017-11-09 08:58:45</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>5818c5ca13568300b1123192e144b02e</sys_id>
-        <sys_mod_count>22</sys_mod_count>
+        <sys_mod_count>34</sys_mod_count>
         <sys_name>UpdateTasksViaRest</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy>read</sys_policy>
@@ -231,6 +234,6 @@ UpdateTasksViaRest.prototype = {
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_include_5818c5ca13568300b1123192e144b02e</sys_update_name>
         <sys_updated_by>souvik.g</sys_updated_by>
-        <sys_updated_on>2017-11-22 10:03:46</sys_updated_on>
+        <sys_updated_on>2017-12-13 10:57:58</sys_updated_on>
     </sys_script_include>
 </record_update>

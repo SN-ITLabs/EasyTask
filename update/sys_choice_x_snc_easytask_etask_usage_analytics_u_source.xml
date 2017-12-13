@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update>
+    <sys_choice action="INSERT_OR_UPDATE" field="u_source" table="x_snc_easytask_etask_usage_analytics" version="3">
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>u_source</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Surf</label>
+            <language>en</language>
+            <name>x_snc_easytask_etask_usage_analytics</name>
+            <sequence>1</sequence>
+            <sys_created_by>souvik.g</sys_created_by>
+            <sys_created_on>2017-12-01 07:07:31</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>7ea10e0d133acf00b1123192e144b0db</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>souvik.g</sys_updated_by>
+            <sys_updated_on>2017-12-01 07:07:31</sys_updated_on>
+            <value>surf</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>u_source</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>ETask_mail</label>
+            <language>en</language>
+            <name>x_snc_easytask_etask_usage_analytics</name>
+            <sequence>2</sequence>
+            <sys_created_by>souvik.g</sys_created_by>
+            <sys_created_on>2017-12-01 07:07:56</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>60a1ca0d133acf00b1123192e144b0ff</sys_id>
+            <sys_mod_count>2</sys_mod_count>
+            <sys_updated_by>souvik.g</sys_updated_by>
+            <sys_updated_on>2017-12-01 07:08:06</sys_updated_on>
+            <value>mail</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>u_source</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Etask_UIPage</label>
+            <language>en</language>
+            <name>x_snc_easytask_etask_usage_analytics</name>
+            <sequence>3</sequence>
+            <sys_created_by>souvik.g</sys_created_by>
+            <sys_created_on>2017-12-01 07:08:27</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>01e10e0d133acf00b1123192e144b0df</sys_id>
+            <sys_mod_count>2</sys_mod_count>
+            <sys_updated_by>souvik.g</sys_updated_by>
+            <sys_updated_on>2017-12-01 07:08:38</sys_updated_on>
+            <value>page</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>u_source</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Chatbot</label>
+            <language>en</language>
+            <name>x_snc_easytask_etask_usage_analytics</name>
+            <sequence>4</sequence>
+            <sys_created_by>souvik.g</sys_created_by>
+            <sys_created_on>2017-12-01 07:08:46</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>28028e0d133acf00b1123192e144b0f3</sys_id>
+            <sys_mod_count>2</sys_mod_count>
+            <sys_updated_by>souvik.g</sys_updated_by>
+            <sys_updated_on>2017-12-01 07:08:56</sys_updated_on>
+            <value>bot</value>
+        </sys_choice>
+        <sys_choice_set action="INSERT_OR_UPDATE">
+            <element>u_source</element>
+            <name>x_snc_easytask_etask_usage_analytics</name>
+            <sys_class_name>sys_choice_set</sys_class_name>
+            <sys_created_by>souvik.g</sys_created_by>
+            <sys_created_on>2017-12-01 07:07:31</sys_created_on>
+            <sys_customer_update>false</sys_customer_update>
+            <sys_id>fec10e0d133acf00b1123192e144b074</sys_id>
+            <sys_mod_count>10</sys_mod_count>
+            <sys_name>u_source</sys_name>
+            <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+            <sys_policy/>
+            <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+            <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+            <sys_update_name>sys_choice_x_snc_easytask_etask_usage_analytics_u_source</sys_update_name>
+            <sys_updated_by>souvik.g</sys_updated_by>
+            <sys_updated_on>2017-12-01 07:08:56</sys_updated_on>
+        </sys_choice_set>
+    </sys_choice>
+</record_update>

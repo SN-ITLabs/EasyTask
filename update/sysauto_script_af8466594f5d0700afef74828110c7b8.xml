@@ -66,7 +66,8 @@ function syncTasks(){
 		sysparm_query: 'name\=Service\-now.com'
 	};
 	
-	var company = RESTMessageExec(restParam);
+	var rstMsg = new RestMessageUtil();
+	var company = rstMsg.executeGET(restParam);
 	
 	restParam = {
 		type: 'GET',
@@ -75,7 +76,7 @@ function syncTasks(){
 		sysparm_fields: 'sys_id'
 	};
 	
-	var allManagersOfServiceNowIndia = RESTMessageExec(restParam);
+	var allManagersOfServiceNowIndia = rstMsg.executeGET(restParam);
 	
 	for(var i =0; i<allManagersOfServiceNowIndia.result.length;i++){
 		
@@ -101,7 +102,7 @@ syncTasks();]]></script>
         <sys_created_on>2017-09-18 14:56:16</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>af8466594f5d0700afef74828110c7b8</sys_id>
-        <sys_mod_count>62</sys_mod_count>
+        <sys_mod_count>63</sys_mod_count>
         <sys_name>Sync tasks for managers subscribed to digest</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
@@ -109,7 +110,7 @@ syncTasks();]]></script>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sysauto_script_af8466594f5d0700afef74828110c7b8</sys_update_name>
         <sys_updated_by>souvik.g</sys_updated_by>
-        <sys_updated_on>2017-11-21 12:44:46</sys_updated_on>
+        <sys_updated_on>2017-12-01 06:41:12</sys_updated_on>
         <upgrade_safe>false</upgrade_safe>
     </sysauto_script>
 </record_update>

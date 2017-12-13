@@ -18,9 +18,10 @@
 		sysparm_query: 'active=true^manager='+managerDetails,
 		sysparm_fields: 'first_name,sys_id'	
 	};
+	var rstMsg = new RestMessageUtil();
 	
-	employeeList = RESTMessageExec(restParam);
-	gs.info('Test: '+JSON.stringify(employeeList));
+	employeeList = rstMsg.executeGET(restParam);
+	
 	
 	var _userTasks = {},_userDefects = {},_userIncidents = {},_userCatalogTasks = {};
 	
@@ -30,7 +31,7 @@
 		restParam.sysparm_query = 'assigned_to='+employeeList.result[emp].sys_id;
 		restParam.sysparm_fields = 'number,state,hours,assigned_to';
 		
-		_userTasks = RESTMessageExec(restParam);
+		_userTasks = rstMsg.executeGET(restParam);
 		
 		for(var i = 0; i<_userTasks.result.length; i++){
 			tasks.scrum_task.push(_userTasks.result[i]);
@@ -40,7 +41,7 @@
 		restParam.sysparm_query = 'u_developer_assigned_to='+employeeList.result[emp].sys_id;
 		restParam.sysparm_fields = 'number,state,time_worked,u_developer_assigned_to';
 		
-		_userDefects = RESTMessageExec(restParam);
+		_userDefects = rstMsg.executeGET(restParam);
 		
 		for(var j = 0; j<_userDefects.result.length; j++){
 			tasks.defects.push(_userDefects.result[j]);
@@ -50,7 +51,7 @@
 		restParam.sysparm_query = 'assigned_to='+employeeList.result[emp].sys_id;
 		restParam.sysparm_fields = 'number,state,time_worked,assigned_to';
 		
-		_userIncidents = RESTMessageExec(restParam);
+		_userIncidents = rstMsg.executeGET(restParam);
 		
 		for(var k = 0; k<_userIncidents.result.length; k++){
 			tasks.incidents.push(_userIncidents.result[k]);
@@ -58,7 +59,7 @@
 		
 		restParam.url = endpointBase + 'sc_task';
 		
-		_userCatalogTasks = RESTMessageExec(restParam);
+		_userCatalogTasks = rstMsg.executeGET(restParam);
 		
 		for(var l = 0; l<_userCatalogTasks.result.length; l++){
 			tasks.sc.push(_userCatalogTasks.result[l]);
@@ -73,7 +74,7 @@
         <sys_created_on>2017-10-04 10:20:34</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>b70e7f526fa54f00f928c8c17c3ee4ef</sys_id>
-        <sys_mod_count>41</sys_mod_count>
+        <sys_mod_count>42</sys_mod_count>
         <sys_name>syncAllTaskStates</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy>read</sys_policy>
@@ -81,6 +82,6 @@
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_include_b70e7f526fa54f00f928c8c17c3ee4ef</sys_update_name>
         <sys_updated_by>souvik.g</sys_updated_by>
-        <sys_updated_on>2017-11-14 12:24:34</sys_updated_on>
+        <sys_updated_on>2017-12-01 06:38:21</sys_updated_on>
     </sys_script_include>
 </record_update>

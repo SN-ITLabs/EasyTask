@@ -11,10 +11,12 @@
         <run_dayofweek>1</run_dayofweek>
         <run_period/>
         <run_start>2017-09-13 11:51:15</run_start>
-        <run_time>1970-01-02 03:30:00</run_time>
+        <run_time>1970-01-02 03:35:00</run_time>
         <run_type>daily</run_type>
         <script><![CDATA[function managerReport(){
 	
+	var _log = gs.getProperty('x_snc_easytask.enablelog');
+	var rstMsg = new RestMessageUtil();
 	var endpointBase = 'https://' + gs.getProperty('x_snc_easytask.surf_instance_name') + '.service-now.com/api/now/table/';
 	
 	var restParam = {
@@ -23,7 +25,10 @@
 		sysparm_query: 'name\=Service\-now.com',	
 	};
 	
-	var company = RESTMessageExec(restParam);
+	if(_log)
+		gs.info('Fetching Daily Manager Report');
+	
+	var company = rstMsg.executeGET(restParam);
 	
 	if(company == '')
 		return;
@@ -35,17 +40,22 @@
 		sysparm_fields: 'email,first_name,sys_id'	
 	};
 	
-	var allManagersOfServiceNowIndia = RESTMessageExec(restParam);
+	var allManagersOfServiceNowIndia = rstMsg.executeGET(restParam);
 	
 	if(allManagersOfServiceNowIndia == '')
 		return;
 	
+	var gtMngrDlgtsTsks = new GetManagerDelegatesTasks();
+	
 	for(var i = 0; i < allManagersOfServiceNowIndia.result.length; i++){
 		
-		var tasks = getManagerDelegatesTasks(allManagersOfServiceNowIndia.result[i].sys_id);
+		var tasks = gtMngrDlgtsTsks.getManagerDelegatesTasks(allManagersOfServiceNowIndia.result[i].sys_id);
 		
 		/*if(gs.getProperty('x_snc_easytask.enablelog'))
 			gs.info("Tasks Updates: "+JSON.stringify(tasks));*/
+		
+		if(_log)
+			gs.info('Event Firing for Manager Report');
 		
 		gs.eventQueue('x_snc_easytask.ManagerReport', current, allManagersOfServiceNowIndia.result[i].email, JSON.stringify(tasks));
 	}
@@ -56,15 +66,15 @@ managerReport();]]></script>
         <sys_created_on>2017-09-13 12:35:40</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>742d80f74f818300afef74828110c791</sys_id>
-        <sys_mod_count>90</sys_mod_count>
+        <sys_mod_count>97</sys_mod_count>
         <sys_name>Manager report generator</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sysauto_script_742d80f74f818300afef74828110c791</sys_update_name>
-        <sys_updated_by>souvik.ghosh</sys_updated_by>
-        <sys_updated_on>2017-11-09 13:33:33</sys_updated_on>
+        <sys_updated_by>souvik.g</sys_updated_by>
+        <sys_updated_on>2017-12-12 15:03:34</sys_updated_on>
         <upgrade_safe>false</upgrade_safe>
     </sysauto_script>
 </record_update>

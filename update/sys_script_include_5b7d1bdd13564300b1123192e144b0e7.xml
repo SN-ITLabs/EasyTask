@@ -45,7 +45,7 @@ GetUserTasks.prototype = {
 				story_desc = _result.result.short_description.toString().length <= _result.result.short_description.toString().substring(0,34) ? _result.result.short_description.toString() + '.' : _result.result.short_description.toString().substring(0,34) + '...';
 		}
 		
-		return story_desc;
+		return story_desc != '' ? story_desc : '...' ;
 		
 	},
 	
@@ -66,11 +66,11 @@ GetUserTasks.prototype = {
 		if(gr.next()){
 			var _time_worked = new GlideDateTime(gr.u_timeworked).getNumericValue();
 			_time_worked = Number(_time_worked/(3600*1000));
-			time._today_logged_hours = Number(time_worked) - _time_worked;
-			time._logged_hours_till_today = Number(time_worked) - Number(time._today_logged_hours);
+			time._today_logged_hours = Math.round(((Number(time_worked) - _time_worked)+0.001)*10)/10;
+			time._logged_hours_till_today = Math.round(((Number(time_worked) - Number(time._today_logged_hours))+0.001)*10)/10;
 		}
 		else{
-			time._today_logged_hours = Number(time_worked);
+			time._today_logged_hours = Math.round((time_worked+0.001)*10)/10;
 		}
 		
 		return time;
@@ -152,7 +152,7 @@ GetUserTasks.prototype = {
         <sys_created_on>2017-11-07 11:56:07</sys_created_on>
         <sys_customer_update>true</sys_customer_update>
         <sys_id>5b7d1bdd13564300b1123192e144b0e7</sys_id>
-        <sys_mod_count>26</sys_mod_count>
+        <sys_mod_count>29</sys_mod_count>
         <sys_name>GetUserTasks</sys_name>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
         <sys_policy>read</sys_policy>
@@ -160,6 +160,6 @@ GetUserTasks.prototype = {
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sys_script_include_5b7d1bdd13564300b1123192e144b0e7</sys_update_name>
         <sys_updated_by>souvik.g</sys_updated_by>
-        <sys_updated_on>2017-11-16 15:04:27</sys_updated_on>
+        <sys_updated_on>2017-12-13 10:30:33</sys_updated_on>
     </sys_script_include>
 </record_update>

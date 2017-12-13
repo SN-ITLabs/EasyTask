@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_snc_easytask.UsageAnalytics</api_name>
+        <client_callable>false</client_callable>
+        <description>Util for Etask usage analytics</description>
+        <name>UsageAnalytics</name>
+        <script><![CDATA[var UsageAnalytics = Class.create();
+UsageAnalytics.prototype = {
+    initialize: function() {
+    },
+	
+	storeHoursLogged: function(email,hours,source){
+		var gr = new GlideRecord('x_snc_easytask_subscribedforemailnotifications');
+		gr.addEncodedQuery('u_email='+email);
+		gr.query();
+		if(gr.next()){
+			gs.info('Store Hours Logged in Analytics for: '+email+', '+hours+' hours');
+			this.createAnalyticsRecord(gr.u_devsysid, hours, source);
+		}
+		else{
+			var rstMsg = RestMessageUtil(),_user;
+			var endpointBase = 'https://' + gs.getProperty('x_snc_easytask.surf_instance_name') + '.service-now.com/api/now/table/';
+			var restParam = {
+				type: 'GET',
+				url: endpointBase + 'sys_user',
+				sysparm_query: 'active=true^email='+email,
+				sysparm_fields: 'sys_id'
+			};
+			_user = rstMsg.executeGET(restParam);
+			if(_user != ''){
+				this.createAnalyticsRecord(_user.result[0].sys_id, hours, source);
+			}
+		}
+	},
+	
+	createAnalyticsRecord: function(sys_id,hours,source){
+		var gdt = new GlideDateTime();
+		var fr =  new GlideRecord('x_snc_easytask_etask_usage_analytics');
+		fr.initialize();
+		fr.u_hours = hours;
+		fr.u_source = source;
+		fr.u_usersysid = sys_id;
+		fr.u_date = gdt.getDate();
+		fr.insert();
+	},
+	
+	storeSurfHours: function(sys_id,hours){
+		
+		var gdt = new GlideDateTime();
+		var fr =  new GlideRecord('x_snc_easytask_etask_usage_analytics');
+		fr.initialize();
+		fr.u_hours = hours;
+		fr.u_source = 'surf';
+		fr.u_usersysid = sys_id;
+		fr.u_date = gdt.getDate();
+		fr.insert();
+	},
+	
+	percentageCalc: function(sys_id){
+		var hours = 0,surf_hours = 0;
+		var fr =  new GlideAggregate('x_snc_easytask_etask_usage_analytics');
+		fr.addEncodedQuery('u_date>=javascript:gs.daysAgoStart(7)^u_sourceINmail,page,bot^u_usersysid='+sys_id);
+		fr.addAggregate('SUM','u_hours');
+		fr.groupBy('u_source');
+		fr.query();
+		
+		while(fr.next())
+			hours = hours + Number(fr.getAggregate('SUM','u_hours'));
+		
+		var gr =  new GlideAggregate('x_snc_easytask_etask_usage_analytics');
+		gr.addEncodedQuery('u_date>=javascript:gs.daysAgoStart(7)^u_sourceINsurf^u_usersysid='+sys_id);
+		gr.addAggregate('SUM','u_hours');
+		gr.groupBy('u_source');
+		gr.query();
+		
+		if(gr.next())
+			surf_hours = surf_hours + Number(gr.getAggregate('SUM','u_hours'));
+		
+		var _roundOff = Number((hours*100)/surf_hours);
+		_roundOff = Math.round((_roundOff+0.001)*10)/10;
+		
+		return isNaN(_roundOff) ? 0 : _roundOff;
+	},
+
+    type: 'UsageAnalytics'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>souvik.g</sys_created_by>
+        <sys_created_on>2017-12-01 08:13:20</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>e7309605137acf00b1123192e144b068</sys_id>
+        <sys_mod_count>28</sys_mod_count>
+        <sys_name>UsageAnalytics</sys_name>
+        <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
+        <sys_update_name>sys_script_include_e7309605137acf00b1123192e144b068</sys_update_name>
+        <sys_updated_by>souvik.g</sys_updated_by>
+        <sys_updated_on>2017-12-13 06:39:44</sys_updated_on>
+    </sys_script_include>
+</record_update>

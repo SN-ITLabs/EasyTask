@@ -49,34 +49,41 @@
 	var updtTasks = new UpdateTasksViaRest();
 	
 	var _response_incident = updtTasks.updateTasksViaRest(incidentResponseJSON,'incident_task');
-	//updatePayloadTable(_response_incident);
 	
 	var _response_defect = updtTasks.updateTasksViaRest(formDefectResponse,'rm_defect');
-	//updatePayloadTable(_response_defect);
 	
 	var _response_task = updtTasks.updateTasksViaRest(formEmailResponseJSON,'rm_scrum_task');
-	//updatePayloadTable(_response_task);
 	
 	var _response_catalog = updtTasks.updateTasksViaRest(catalogResponseJSON,'sc_task');
 	
 	var _response_new_task = createTasksViaRest(createTasksJSON, email.from);
-	//updatePayloadTable(_response_new_task);
 	
 	var response = {
 		ScrumTasks: {
-			response_task: _response_task,
+			response_task: _response_task.response,
 			response_new_task: _response_new_task
 		},
 		Defects: {
-			response_defect : _response_defect
+			response_defect : _response_defect.response
 		},
 		Incidents: {
-			response_incident : _response_incident
+			response_incident : _response_incident.response
 		},
 		Catalog: {
-			response_catalog: _response_catalog
+			response_catalog: _response_catalog.response
 		}
 	};
+	
+	try{
+		var totalHourstoLog = _response_task.hours + _response_defect.hours + _response_incident.hours + _response_catalog.hours;
+		
+		var usg = new UsageAnalytics();
+		usg.storeHoursLogged(email.from,totalHourstoLog,'mail');
+	}
+	catch(err){
+		gs.error('Usage Analytics storage failed ' + err.toString() + 'for '+email.from);
+	}
+	
 	gs.eventQueue('x_snc_easytask.acknowledgeTaskRespon', current, email.from, JSON.stringify(response));
 })(current, event, email, logger, classifier);]]></script>
         <stop_processing>false</stop_processing>
@@ -87,7 +94,7 @@
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>8eee3de66f30c300f928c8c17c3ee49e</sys_id>
-        <sys_mod_count>173</sys_mod_count>
+        <sys_mod_count>186</sys_mod_count>
         <sys_name>Update/Create tasks</sys_name>
         <sys_overrides/>
         <sys_package display_value="Easy Task" source="x_snc_easytask">973abda26f30c300f928c8c17c3ee4fc</sys_package>
@@ -96,7 +103,7 @@
         <sys_scope display_value="Easy Task">973abda26f30c300f928c8c17c3ee4fc</sys_scope>
         <sys_update_name>sysevent_in_email_action_8eee3de66f30c300f928c8c17c3ee49e</sys_update_name>
         <sys_updated_by>souvik.g</sys_updated_by>
-        <sys_updated_on>2017-11-14 15:41:11</sys_updated_on>
+        <sys_updated_on>2017-12-13 07:07:05</sys_updated_on>
         <table>sysauto_script</table>
         <template/>
         <type>reply</type>

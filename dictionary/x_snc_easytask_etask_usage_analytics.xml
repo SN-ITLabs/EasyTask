@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <element label="Etask usage analytics" max_length="40" name="x_snc_easytask_etask_usage_analytics" type="collection">
+        <element label="Date Created" max_length="40" name="u_date" type="glide_date"/>
+        <element label="Hours logged" max_length="32" name="u_hours" type="decimal"/>
+        <element choice="3" label="Source" max_length="40" name="u_source" type="choice">
+            <choice>
+                <element label="Surf" sequence="1" value="surf"/>
+                <element label="ETask_mail" sequence="2" value="mail"/>
+                <element label="Etask_UIPage" sequence="3" value="page"/>
+                <element label="Chatbot" sequence="4" value="bot"/>
+            </choice>
+        </element>
+        <element label="UserSysID" max_length="32" name="u_usersysid" type="string"/>
+    </element>
+</database>
